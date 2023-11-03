@@ -24,8 +24,8 @@ export class Camera {
       this.maxX = this.game.map.width - this.viewportWidth;
       this.maxY = this.game.map.height - this.viewportHeight;
 
-      this.x = lerp(this.x, Math.max(0, Math.min(centerX, this.maxX)), 0.5)
-      this.y = lerp(this.y, Math.max(0, Math.min(centerY, this.maxY)), 0.5)
+      this.x = lerp(this.x, Math.max(0, Math.min(centerX, this.maxX)), 0.4)
+      this.y = lerp(this.y, Math.max(0, Math.min(centerY, this.maxY)), 0.4)
 
     }
   }

@@ -19,6 +19,8 @@ export class Player {
         this.multiplyScore = 1;
         this.deadTimer = 0;
         this.deadInterval = 5000;
+        this.kills = 0;
+        this.deaths = 0;
 
         this.initBase();
 
@@ -52,15 +54,18 @@ export class Player {
 
                  if (this.isHitSelf(land)) {
                     this.dead = true;
+                    this.deaths++;
                     this.clear();
 
                 } else if (this.HitAnotherPlayer(land)) {
                     const hittedPlayer =  this.game.getPlayer(land.playerId);
                     hittedPlayer.dead = true;
+                    hittedPlayer.deaths++;
+                    this.kills++;
                     hittedPlayer.clear();
                     this.score += 10;
-                   
-                } 
+
+                }
                
                 if (land.playerId !== this.id && !this.dead) {
                     this.addLandToTail(land);
@@ -112,12 +117,12 @@ export class Player {
             } else if (this.direction === Direction.Left) {
                 this.x -= this.speed;
             }
-          
 
             if(this.isHitInBorders()){
                 this.dead = true;
+                this.deaths++;
                 this.clear();
-                
+
             }
 
 
@@ -191,8 +196,6 @@ export class Player {
     HitAnotherPlayer(tile) {
 
         if (tile.playerId !== this.id && tile.playerId !== 0 && tile.type === 'tail'){
-
-        
           return true;
         }
       return false;
@@ -310,7 +313,11 @@ export class Player {
     setInput(input) {
         this.input = input;
     }
+    getCountTiles(){
+        return this.lands.length;
+    }
     toJSON() {
+        const percentageOfMap = this.getOwnPercentageOfMap();
         return {
             nickname: this.nickname,
             color: this.color,
@@ -323,7 +330,10 @@ export class Player {
             lands: this.lands,
             tail: this.tail,
             deadTimer: this.deadTimer,
-            deadInterval: this.deadInterval
+            deadInterval: this.deadInterval,
+            kills: this.kills,
+            deaths: this.deaths,
+            percentageOfMap: percentageOfMap,
 
         };
     }

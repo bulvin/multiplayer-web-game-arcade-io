@@ -41,7 +41,7 @@ export class Network {
 
         if (player) {
 
-            this.io.emit('disconnected', player,`Gracz ${player.nickname} opuścił rozgrywkę.`);
+            this.io.emit('disconnected', `Gracz ${player.nickname} opuścił rozgrywkę.`);
         }
     } 
     sendGameUpdate(timestamp) {

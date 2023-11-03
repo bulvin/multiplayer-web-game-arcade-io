@@ -15,7 +15,7 @@ socket.on('playerJoined', (player) => {
   console.log('Gracz dołączył do gry: ', player);
 });
 
-socket.on('disconnected', (deletedPlayer,info) => {
+socket.on('disconnected', (info) => {
 
   console.log(info);
 })

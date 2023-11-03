@@ -109,6 +109,11 @@ export class Game {
             player.initBase();
        }
     }
+    getLeaderboard() {
+       return Object.values(this.players).sort((a, b) => {
+            return b.score - a.score;
+        });
+    }
     deadMessage(deadInterval, deadTime) {
 
         let messageDead = 'Wyelimowano cię!';
@@ -117,10 +122,11 @@ export class Game {
         return [messageDead, messageTime];
     }
     toJSON() {
-        let backendplayers = {};
-        for (const id in this.players){
-            const player = this.players[id];
-            backendplayers[id] = player.toJSON();
+        const leaderboard = this.getLeaderboard();
+
+        let backendPlayers = {};
+        for (const player of leaderboard) {
+            backendPlayers[player.id] = player.toJSON();
         }
         return {
             id: this.id,
@@ -129,7 +135,7 @@ export class Game {
             abilities: this.abilities,
             bonuses: this.bonuses,
             gameOver: this.gameOver,
-            players: backendplayers,
+            players: backendPlayers,
         };
     }
    
