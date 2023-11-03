@@ -21,6 +21,9 @@ export class Player {
         this.deadInterval = 5000;
         this.kills = 0;
         this.deaths = 0;
+        this.abilitiesBinds = {};
+        this.activeAbility = null;
+        this.bonuses = [];
 
         this.initBase();
 
@@ -31,7 +34,7 @@ export class Player {
         let setlands;
 
         if (this.dead) {
-            this.clear();
+          this.clear();
             if (this.deadTimer > this.deadInterval) {
                 this.dead = false;
                 this.direction = -1;
@@ -43,30 +46,28 @@ export class Player {
         }
         else {
             this.checkTakeEffects();
+
+            const ability = this.useAbility();
+            if (ability) {
+                this.activeAbility = ability;
+            }
+
             if (Number.isInteger(this.x / this.psize) && Number.isInteger(this.y / this.psize)) {
                 let col = this.game.map.getCol(this.x);
                 let row = this.game.map.getRow(this.y);
                 let land = this.game.map.getTile(row, col);
 
                 if (this.input.length > 0) this.setDirection();
-                
-               
 
-                 if (this.isHitSelf(land)) {
+
+
+                if (this.isHitSelf(land)) {
                     this.dead = true;
                     this.deaths++;
                     this.clear();
 
-                } else if (this.HitAnotherPlayer(land)) {
-                    const hittedPlayer =  this.game.getPlayer(land.playerId);
-                    hittedPlayer.dead = true;
-                    hittedPlayer.deaths++;
-                    this.kills++;
-                    hittedPlayer.clear();
-                    this.score += 10;
+                } 
 
-                }
-               
                 if (land.playerId !== this.id && !this.dead) {
                     this.addLandToTail(land);
                 }
@@ -118,16 +119,23 @@ export class Player {
                 this.x -= this.speed;
             }
 
-            if(this.isHitInBorders()){
+            if (this.isHitInBorders()) {
                 this.dead = true;
                 this.deaths++;
                 this.clear();
 
             }
+            
 
 
         }
+        if (this.activeAbility !== null && this.activeAbility.duration > 0) {
+            this.activeAbility.duration -= deltaTime;
 
+            if (this.activeAbility.duration <= 0) {
+                this.resetAbilityEffect();
+            }
+        }
 
     }
 
@@ -183,22 +191,29 @@ export class Player {
 
     isHitSelf(squareTail) {
         if (this.tail.includes(squareTail) && squareTail.x === this.x && squareTail.y === this.y) {
-          
+
             return true;
         }
 
         return false;
     }
-    isHitInBorders(){
+    isHitInBorders() {
         return this.x < -4 || this.x > this.game.map.width - this.psize + 4 || this.y < -4 || this.y > this.game.map.height - this.psize + 4;
 
     }
-    HitAnotherPlayer(tile) {
-
-        if (tile.playerId !== this.id && tile.playerId !== 0 && tile.type === 'tail'){
-          return true;
+    isSomeoneHitsMe(otherPlayer) {
+      
+        for (const segment of this.tail) {
+          if (segment.x === otherPlayer.x && segment.y === otherPlayer.y) {
+          
+            this.dead = true;
+            this.deaths++;
+            this.clear();
+            otherPlayer.kills++;
+            otherPlayer.score += 10;
+            break; 
+          }
         }
-      return false;
     }
     clear() {
         this.lands.forEach(square => {
@@ -250,7 +265,7 @@ export class Player {
         abilities.forEach((ability, index) => {
             const abilityPosition = ability.position;
 
-         
+
             const distance = Math.hypot(abilityPosition.x - this.x, abilityPosition.y - this.y);
             const abilityRadius = Math.PI * 2;
 
@@ -267,7 +282,7 @@ export class Player {
             const distance = Math.hypot(bonusPosition.x - this.x, bonusPosition.y - this.y);
             const bonusRadius = Math.PI * 2;
 
-            const collisionThreshold =  this.psize + 2 + bonusRadius;
+            const collisionThreshold = this.psize + 2 + bonusRadius;
             if (distance <= collisionThreshold) {
                 this.applyBonusEffect(bonus);
                 bonuses.splice(index, 1);
@@ -276,11 +291,51 @@ export class Player {
 
     }
     applyAbilityEffect(ability) {
+        if (!this.abilitiesBinds[Keys.R]) {
 
-        if (ability.name === "Speed") {
-            this.speed = 8;
+            this.abilitiesBinds[Keys.R] = ability;
+
+        } else if (!this.abilitiesBinds[Keys.T]) {
+
+            this.abilitiesBinds[Keys.T] = ability;
+            
+        } else if (!this.abilitiesBinds[Keys.E]) {
+
+            this.abilitiesBinds[Keys.E] = ability;
+        }
+
+    }
+    useAbility() {
+        if (this.input.includes(Keys.R)) {
+            if (this.abilitiesBinds[Keys.R]) {
+
+                const ability = this.abilitiesBinds[Keys.R];
+                if (ability.name === 'Speed') {
+                    this.speed = 8;
+                    
+                }
+                return ability;
+            }
+          
 
         }
+        return null;
+    }
+    resetAbilityEffects() {
+
+        if (this.activeAbility && this.activeAbility.name === 'Speed') {
+            this.speed = 4;
+        }
+
+        for (const key of Object.keys(this.abilitiesBinds)) {
+            if (this.abilitiesBinds[key] === this.activeAbility) {
+              this.abilitiesBinds[key] = null;
+              break;
+            }
+          }
+
+        this.activeAbility = null;
+      
     }
     applyBonusEffect(bonus) {
         if (bonus.name === 'x2') {
@@ -313,7 +368,9 @@ export class Player {
     setInput(input) {
         this.input = input;
     }
-    getCountTiles(){
+
+
+    getCountTiles() {
         return this.lands.length;
     }
     toJSON() {
@@ -343,7 +400,9 @@ const Keys = {
     W: 'w',
     S: 's',
     A: 'a',
-    D: 'd'
+    D: 'd',
+    R: 'r',
+    T: 't'
 }
 
 const Direction = {

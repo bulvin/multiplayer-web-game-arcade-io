@@ -20,6 +20,8 @@ export class Game {
         this.abilities = [];
         this.bonuses = [];
 
+        window.addEventListener("resize", this.resizeCanvas.bind(this));
+
     }
     update(gameData) {
         this.map.tiles = gameData.map.tiles;
@@ -144,6 +146,19 @@ export class Game {
         const frontendBonus = new Bonus(this, bonusName, bonusInfo.duration, bonusPosition.x, bonusPosition.y);
         this.bonuses.push(frontendBonus);
 
+    }
+    resizeCanvas() {
+       
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        const newWidth = window.innerWidth * devicePixelRatio;
+        const newHeight = window.innerHeight * devicePixelRatio;
+    
+        this.canvas.width = newWidth;
+        this.canvas.height = newHeight;
+       
+        this.context.scale(devicePixelRatio, devicePixelRatio);
+    
+        this.camera.setViewport(newWidth, newHeight);
     }
 
 

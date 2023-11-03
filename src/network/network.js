@@ -44,20 +44,20 @@ export class Network {
             this.io.emit('disconnected', `Gracz ${player.nickname} opuścił rozgrywkę.`);
         }
     } 
-    sendGameUpdate(timestamp) {
-        const gameData = this.game.toJSON();
+        sendGameUpdate(timestamp) {
+            const gameData = this.game.toJSON();
 
-        this.io.emit('updateGame', gameData, timestamp);
-    }
-    onKeydown(socket, input) {
-        const serverTime = Date.now();
-        const networkDelay = (serverTime - input.timestamp);
-        const player = this.game.getPlayer(socket.id);  
-        if (!player || networkDelay > 120){
-            return;
-        } 
-        player.setInput(input.keys);
-    }
+            this.io.emit('updateGame', gameData, timestamp);
+        }
+        onKeydown(socket, input) {
+            const serverTime = Date.now();
+            const networkDelay = (serverTime - input.timestamp);
+            const player = this.game.getPlayer(socket.id);  
+            if (!player || networkDelay > 120){
+                return;
+            } 
+            player.setInput(input.keys);
+        }
 
       
 

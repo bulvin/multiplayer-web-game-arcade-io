@@ -16,7 +16,7 @@ function animate() {
   for (const id in gameManager.games) {
     const game = gameManager.games[id];
 
-   game.camera.update();
+    game.camera.update();
     game.draw();
 
   }
@@ -30,29 +30,14 @@ window.addEventListener("load", function () {
   canvas.height = window.innerHeight * devicePixelRatio;
 
   enterNickname(`Player${countNickname}`);
-countNickname++;
+  countNickname++;
 
 });
 
 
-function resize() {
-  canvas.width = window.innerWidth * devicePixelRatio;
-  canvas.height = window.innerHeight * devicePixelRatio;
-  for (const id in gameManager.games) {
-    const game = gameManager.games[id];
-
-    game.camera.update();
-
-
-  }
-}
-
 export function lerp(start, end, lerpFactor) {
   return start + (end - start) * lerpFactor;
 }
-
-
-window.addEventListener("resize", resize);
 
 canvas.addEventListener("wheel", (event) => {
   event.preventDefault();

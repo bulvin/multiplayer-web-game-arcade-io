@@ -42,7 +42,17 @@ export class Game {
             for (const id in this.players){
                 const player = this.players[id];
                 const socket = this.sockets[id];
+
                 player.update(deltaTime);
+
+                for (const otherId in this.players) {
+                    if (id !== otherId) {
+                        const otherPlayer = this.players[otherId];
+                        player.isSomeoneHitsMe(otherPlayer);
+                      
+                    }
+                }
+
                 if (player.dead) {
                     socket.emit('deadMessage', { player: player.id, messages: this.deadMessage(player.deadInterval, player.deadTimer) } );
                 }
@@ -72,7 +82,7 @@ export class Game {
 
     }
     spawnBonus(){
-        const bonuses = ['x2', 'x4', 'x8'] ; 
+        const bonuses = ['x2', 'x4', 'x8']; 
         const randomIndex = Math.floor(Math.random() * bonuses.length);
         const randomName = bonuses[randomIndex];
 
@@ -82,7 +92,7 @@ export class Game {
         const duration = 5000 * 2;
         const bonus = new Bonus(col * this.map.tileSize, row * this.map.tileSize, randomName, duration);
 
-        this.bonuses.push(bonus);
+        this.bonuses.push(bonus)
 
     }
     addPlayer(socket, username) {
