@@ -41,7 +41,7 @@ export class GameMap {
                     points = 10;
                     points *= pointsScale;
                 }
-                let tile = { x: tileX, y: tileY, playerId: 0, score: points, tileSize: this.tileSize, type: 'land'};
+                let tile = { x: tileX, y: tileY, playerId: 0, score: points, tileSize: this.tileSize, hasTail: false};
                 this.tiles[row].push(tile);
                 tileX += this.tileSize;
 

@@ -28,24 +28,25 @@ export class GameMap {
                 const y = row * tileSize - cameraY;
                 const tile = this.tiles[row][col];
                 const playerId = tile.playerId;
-
-                if (playerId === 0) {
-                    context.fillStyle = '#111';
-                } else {
+                if (tile.hasTail ) {
+                    context.fillStyle = 'hsl(0, 100%, 50%)'; 
+                }  else if (playerId !== 0) {
                     let player;
-                    for (const id in players){
+                    for (const id in players) {
                         const frontendPlayer = players[id];
-                        if (id === playerId){
+                        if (id === playerId) {
                             player = frontendPlayer;
                             break;
                         }
                     }
-                    if (player && tile.type === "land") {
+                    if (player) {
                         context.fillStyle = player.color;
-                    } else if (player && tile.type === "tail") {
-                        context.fillStyle = 'hsl(0, 100%, 50%)';
                     }
-                }
+                } else if (playerId === 0) {
+                    context.fillStyle = '#111'; 
+                } 
+               
+              
 
                 context.fillRect(x, y, tileSize, tileSize);
             }

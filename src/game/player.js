@@ -69,9 +69,9 @@ export class Player {
                 } 
 
                 if (land.playerId !== this.id && !this.dead) {
-                    this.addLandToTail(land);
+                   this.addLandToTail(land); 
                 }
-                if (land.type === "land" && this.id === land.playerId && this.tail.length > 0) {
+                if (this.id === land.playerId && this.tail.length > 0) {
                     for (let i = 0; i < this.lands.length; i++) {
                         this.tail.push(this.lands[i]);
                     }
@@ -99,9 +99,7 @@ export class Player {
                     this.lands.push(...setlands);
                     this.lands.forEach(land => {
                         land.playerId = this.id;
-                        if (land.type !== "land") {
-                            land.type = "land";
-                        }
+                        land.hasTail = false;
                     });
 
                     this.gainPoints();
@@ -172,9 +170,7 @@ export class Player {
 
     }
     addLandToTail(land) {
-
-        land.playerId = this.id;
-        land.type = 'tail';
+        land.hasTail = true; 
         return this.tail.push(land);
     }
 
@@ -219,11 +215,11 @@ export class Player {
     clear() {
         this.lands.forEach(square => {
             square.playerId = 0;
+            square.hasTail = false;
         });
         this.tail.forEach(square => {
-            square.playerId = 0;
-            square.type = 'land';
-        })
+            square.hasTail = false;
+        });
         this.lands = [];
         this.tail = [];
         this.score = 0;

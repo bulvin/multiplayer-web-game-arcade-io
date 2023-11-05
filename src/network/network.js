@@ -38,7 +38,7 @@ export class Network {
     }  
     disconnect(socket){
         const player = this.game.deletePlayer(socket.id);
-
+        player.clear();
         if (player) {
 
             this.io.emit('disconnected', `Gracz ${player.nickname} opuścił rozgrywkę.`);
