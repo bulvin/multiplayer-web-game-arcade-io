@@ -179,7 +179,8 @@ export class Player {
     }
 
     gainPoints() {
-        this.lands.forEach(land => this.score += land.score * this.multiplyScore);
+  
+       this.lands.forEach(land => this.score += land.score * this.multiplyScore);
 
     }
     getOwnPercentageOfMap() {
@@ -391,6 +392,7 @@ export class Player {
             kills: this.kills,
             deaths: this.deaths,
             percentageOfMap: percentageOfMap,
+            multiplyScore: this.multiplyScore,
 
         };
     }

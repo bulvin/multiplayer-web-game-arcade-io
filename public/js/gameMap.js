@@ -89,7 +89,7 @@ export class GameMap {
             }
         }
 
-        context.lineWidth = 2.5;
+        context.lineWidth = 2;
         context.strokeStyle = '#191919';
         context.stroke();
 
@@ -99,7 +99,7 @@ export class GameMap {
     }
 
     #drawBorderMap(context, camera) {
-        context.save();
+    
         context.beginPath();
 
         const lineWidth = 10;
@@ -121,7 +121,6 @@ export class GameMap {
         context.setLineDash([]);
         context.stroke();
 
-        context.restore();
     }
    
 

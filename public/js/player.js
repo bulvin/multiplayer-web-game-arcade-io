@@ -3,7 +3,7 @@ import {UI} from "./ui.js";
 
 export class Player {
 
-    constructor({nickname, color, x, y, speed, direction,lands, tail, score, dead, deadTimer, deadInterval}, game) {
+    constructor({nickname, color, x, y, speed, direction,lands, tail, score, dead, deadTimer, deadInterval, multiplyScore}, game) {
 
         this.nickname = nickname;
         this.x = x;
@@ -17,6 +17,7 @@ export class Player {
         this.dead = dead;
         this.deadTimer = deadTimer;
         this.deadInterval = deadInterval
+        this.multiplyScore = multiplyScore
         this.input = [];
         this.abilities = [];
         this.target = {

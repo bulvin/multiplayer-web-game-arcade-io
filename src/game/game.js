@@ -44,6 +44,7 @@ export class Game {
                 const socket = this.sockets[id];
 
                 player.update(deltaTime);
+           
 
                 for (const otherId in this.players) {
                     if (id !== otherId) {

@@ -28,7 +28,7 @@ export class Game {
         this.gameTimer = gameData.gameTimer;
         this.gameOver = gameData.gameOver;
 
-
+    
 
         for (const playerID in this.players) {
             if (!gameData.players[playerID]) {
@@ -38,7 +38,7 @@ export class Game {
 
         for (const playerId in gameData.players) {
             const backendPlayer = gameData.players[playerId];
-
+            
             if (this.players[playerId]) {
                 const clientPlayer = this.players[playerId];
                 clientPlayer.direction = backendPlayer.direction;
@@ -49,6 +49,8 @@ export class Game {
                 clientPlayer.score = backendPlayer.score;
                 clientPlayer.speed = backendPlayer.speed;
                 clientPlayer.direction = backendPlayer.direction;
+                clientPlayer.multiplyScore = backendPlayer.multiplyScore;
+                clientPlayer.percentage = backendPlayer.percentageOfMap;
 
                 clientPlayer.target.x = backendPlayer.x;
                 clientPlayer.target.y = backendPlayer.y;
@@ -80,6 +82,7 @@ export class Game {
 
         for (const id in this.players) {
             const player = this.players[id]
+          
             if (player.dead === false) {
 
                 player.x = lerp(player.x, player.target.x, 0.5);
@@ -121,7 +124,8 @@ export class Game {
             score: player.score,
             dead: player.dead,
             deadTimer: player.deadTimer,
-            deadInterval: player.deadInterval
+            deadInterval: player.deadInterval,
+            multiplyScore: player.multiplyScore,
         }, this);
 
         this.players[id] = frontendPlayer;
