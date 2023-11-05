@@ -45,7 +45,6 @@ export class Game {
 
                 player.update(deltaTime);
            
-
                 for (const otherId in this.players) {
                     if (id !== otherId) {
                         const otherPlayer = this.players[otherId];
@@ -55,7 +54,8 @@ export class Game {
                 }
 
                 if (player.dead) {
-                    socket.emit('deadMessage', { player: player.id, messages: this.deadMessage(player.deadInterval, player.deadTimer) } );
+                   let messages = this.deadMessage(player.deadInterval, player.deadTimer)
+                   socket.emit('deadMessage', { player: player.id, messages: messages } );
                 }
 
             }
@@ -125,6 +125,11 @@ export class Game {
             return b.score - a.score;
         });
     }
+    getLeaderboardPosition(search) {
+        const leaderboard = this.getLeaderboard();
+        const playerIndex = leaderboard.findIndex(player => player === search);
+        return playerIndex === -1 ? "Brak" : playerIndex + 1;
+    }
     deadMessage(deadInterval, deadTime) {
 
         let messageDead = 'Wyelimowano cię!';
@@ -133,11 +138,10 @@ export class Game {
         return [messageDead, messageTime];
     }
     toJSON() {
-        const leaderboard = this.getLeaderboard();
-
+       
         let backendPlayers = {};
-        for (const player of leaderboard) {
-            backendPlayers[player.id] = player.toJSON();
+        for (const id in this.players) {
+            backendPlayers[id] = this.players[id].toJSON();
         }
         return {
             id: this.id,

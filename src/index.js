@@ -30,7 +30,7 @@ const game = new Game(5, gameMap);
 
 const network = new Network(io, game);
 
-let lastUpdateTime = performance.now();
+let lastUpdateTime = 0;
 
 setInterval(() => {
   const currentTime = performance.now();

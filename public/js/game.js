@@ -28,8 +28,6 @@ export class Game {
         this.gameTimer = gameData.gameTimer;
         this.gameOver = gameData.gameOver;
 
-    
-
         for (const playerID in this.players) {
             if (!gameData.players[playerID]) {
                 delete this.players[playerID];
@@ -41,17 +39,14 @@ export class Game {
             
             if (this.players[playerId]) {
                 const clientPlayer = this.players[playerId];
-                clientPlayer.direction = backendPlayer.direction;
                 clientPlayer.dead = backendPlayer.dead;
-                clientPlayer.deadTimer = backendPlayer.deadTimer;
-                clientPlayer.lands = backendPlayer.lands;
-                clientPlayer.tail = backendPlayer.tail;
+                clientPlayer.kills = backendPlayer.kills;
+                clientPlayer.deaths = backendPlayer.deaths;
+                clientPlayer.territory = backendPlayer.territory;
                 clientPlayer.score = backendPlayer.score;
-                clientPlayer.speed = backendPlayer.speed;
-                clientPlayer.direction = backendPlayer.direction;
-                clientPlayer.multiplyScore = backendPlayer.multiplyScore;
-                clientPlayer.percentage = backendPlayer.percentageOfMap;
-
+                clientPlayer.posLeaderboard = backendPlayer.posLeaderboard;
+            
+                
                 clientPlayer.target.x = backendPlayer.x;
                 clientPlayer.target.y = backendPlayer.y;
 
@@ -82,7 +77,7 @@ export class Game {
 
         for (const id in this.players) {
             const player = this.players[id]
-          
+           
             if (player.dead === false) {
 
                 player.x = lerp(player.x, player.target.x, 0.5);
@@ -91,7 +86,10 @@ export class Game {
                 player.draw();
 
             }
-            player.ui.draw();
+            if (player === this.camera.targetPlayer) {
+                player.ui.draw();
+            }
+            
         }
 
         
@@ -109,23 +107,17 @@ export class Game {
 
 
 
-        //  this.ui.draw();
+       
     }
     addPLayer(player, id) {
+       
         const frontendPlayer = new Player({
             nickname: player.nickname,
             color: player.color,
             x: player.x,
             y: player.y,
-            speed: player.speed,
-            direction: player.direction,
-            lands: player.lands,
-            tail: player.tail,
-            score: player.score,
             dead: player.dead,
-            deadTimer: player.deadTimer,
-            deadInterval: player.deadInterval,
-            multiplyScore: player.multiplyScore,
+       
         }, this);
 
         this.players[id] = frontendPlayer;

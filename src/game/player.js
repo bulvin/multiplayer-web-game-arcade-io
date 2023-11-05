@@ -295,7 +295,6 @@ export class Player {
         if (!this.abilitiesBinds[Keys.R]) {
 
             this.abilitiesBinds[Keys.R] = ability;
-
         } else if (!this.abilitiesBinds[Keys.T]) {
 
             this.abilitiesBinds[Keys.T] = ability;
@@ -375,25 +374,17 @@ export class Player {
         return this.lands.length;
     }
     toJSON() {
-        const percentageOfMap = this.getOwnPercentageOfMap();
+       const territory = this.getOwnPercentageOfMap();
         return {
             nickname: this.nickname,
             color: this.color,
             x: this.x,
             y: this.y,
-            speed: this.speed,
-            dead: this.dead,
-            direction: this.direction,
             score: this.score,
-            lands: this.lands,
-            tail: this.tail,
-            deadTimer: this.deadTimer,
-            deadInterval: this.deadInterval,
+            dead: this.dead,
             kills: this.kills,
             deaths: this.deaths,
-            percentageOfMap: percentageOfMap,
-            multiplyScore: this.multiplyScore,
-
+            territory: territory,
         };
     }
 }
