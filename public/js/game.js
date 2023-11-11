@@ -92,7 +92,6 @@ export class Game {
             
         }
 
-        
             for (const i in this.abilities) {
                 const ability = this.abilities[i];
                 ability.draw();
@@ -104,8 +103,6 @@ export class Game {
                 bonus.draw();
             }
         
-
-
 
        
     }

@@ -34,7 +34,7 @@ export class Player {
         let setlands;
 
         if (this.dead) {
-          this.clear();
+
             if (this.deadTimer > this.deadInterval) {
                 this.dead = false;
                 this.direction = -1;
@@ -58,8 +58,6 @@ export class Player {
                 let land = this.game.map.getTile(row, col);
 
                 if (this.input.length > 0) this.setDirection();
-
-
 
                 if (this.isHitSelf(land)) {
                     this.dead = true;
@@ -127,11 +125,11 @@ export class Player {
 
 
         }
-        if (this.activeAbility !== null && this.activeAbility.duration > 0) {
+        if (this.activeAbility && this.activeAbility.duration > 0) {
             this.activeAbility.duration -= deltaTime;
 
             if (this.activeAbility.duration <= 0) {
-                this.resetAbilityEffect();
+                this.resetAbilityEffects();
             }
         }
 
@@ -213,13 +211,17 @@ export class Player {
         }
     }
     clear() {
-        this.lands.forEach(square => {
-            square.playerId = 0;
-            square.hasTail = false;
-        });
-        this.tail.forEach(square => {
-            square.hasTail = false;
-        });
+        if (this.dead) {
+            this.lands.forEach(square => {
+                square.playerId = 0;
+                square.hasTail = false;
+            });
+        }
+
+            this.tail.forEach(square => {
+                square.hasTail = false;
+            });
+
         this.lands = [];
         this.tail = [];
         this.score = 0;
@@ -302,6 +304,7 @@ export class Player {
 
     }
     useAbility() {
+
         if (this.input.includes(Keys.R)) {
             if (this.abilitiesBinds[Keys.R]) {
 
@@ -312,14 +315,13 @@ export class Player {
                 }
                 return ability;
             }
-          
 
         }
         return null;
     }
     resetAbilityEffects() {
 
-        if (this.activeAbility && this.activeAbility.name === 'Speed') {
+        if (this.activeAbility.name === 'Speed') {
             this.speed = 4;
         }
 
@@ -347,11 +349,10 @@ export class Player {
         const spawnRow = this.game.map.getRow(this.y);
         const spawnCol = this.game.map.getCol(this.x);
 
-
         for (let row = -1; row < 2; row++) {
             for (let col = -1; col < 2; col++) {
                 const newRow = spawnRow + row;
-                const newCol = spawnCol + col
+                const newCol = spawnCol + col;
 
                 if (newRow >= 0 && newRow < this.game.map.rows && newCol >= 0 && newCol < this.game.map.cols) {
                     const spawnLand = this.game.map.getTile(newRow, newCol);

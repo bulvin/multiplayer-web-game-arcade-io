@@ -38,7 +38,6 @@ export class Network {
     }  
     disconnect(socket){
         const player = this.game.deletePlayer(socket.id);
-        player.clear();
         if (player) {
 
             this.io.emit('disconnected', `Gracz ${player.nickname} opuścił rozgrywkę.`);
@@ -50,10 +49,8 @@ export class Network {
             this.io.emit('updateGame', gameData, timestamp);
         }
         onKeydown(socket, input) {
-            const serverTime = Date.now();
-            const networkDelay = (serverTime - input.timestamp);
             const player = this.game.getPlayer(socket.id);  
-            if (!player || networkDelay > 120){
+            if (!player){
                 return;
             } 
             player.setInput(input.keys);

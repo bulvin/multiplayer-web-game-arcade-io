@@ -25,8 +25,8 @@ server.listen(port, () => {
   console.log(`Serwer działa na porcie: ${port}`);
 });
 
-const gameMap = new GameMap(100, 100);
-const game = new Game(5, gameMap);
+
+const game = new Game(5, new GameMap(100, 100));
 
 const network = new Network(io, game);
 
@@ -42,4 +42,4 @@ setInterval(() => {
 
   network.sendGameUpdate(currentTime);
   
-}, 14);
+}, 13);

@@ -15,29 +15,29 @@ export class UI {
         this.titleSpacing = 20;
         this.formattedTimer = '';
         this.rectY = 0;
-  
-        this.leaderboard = []; 
+
     }
 
     draw() {
        
         this.ctx.save();
-     
-        this.updateTimer();
-        this.drawScoreBoard();
-        this.drawStats();
-          
-        if (this.messages.length > 0) {
-            this.drawDeadMessage(this.messages[0], this.messages[1]);
-            if (!this.player.dead) {
-                this.messages = [];
-            }
-        }
 
         if (this.game.gameOver) {
             this.gameOver();
         }
-
+        else {
+            this.updateTimer();
+            this.drawScoreBoard();
+            this.drawStats();
+              
+            if (this.messages.length > 0) {
+                this.drawDeadMessage(this.messages[0], this.messages[1]);
+                if (!this.player.dead) {
+                    this.messages = [];
+                }
+            }
+        }
+       
         this.ctx.restore();
     }
 
@@ -62,27 +62,7 @@ export class UI {
         this.ctx.restore();
     }
 
-    gameOver() {
-    
-
-        this.ctx.save();
-        this.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
-        this.ctx.fillStyle = this.color;
-        const lineHeight = this.fontSize + 10;
-        const textHeight = lineHeight * 4;
-        this.rectY = (this.canvas.height - textHeight) * 0.5;
-        this.ctx.save();
-        this.ctx.globalAlpha = 0.8;
-        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
-        this.ctx.fillRect(0, this.rectY, this.canvas.width, textHeight);
-        this.ctx.restore();
-        this.ctx.textAlign = 'center';
-        let message = 'Gra skończona';
-        let messageUsers = Object.values(this.game.players).map(player => ' ' + player.nickname).join('');
-        this.ctx.fillText(message, this.canvas.width * 0.5, this.rectY + this.fontSize + lineHeight);
-        this.ctx.fillText(messageUsers, this.canvas.width * 0.5, this.rectY + this.fontSize + 2 * lineHeight);
-        this.ctx.restore();
-    }
+ 
    drawScoreBoard() {
     this.ctx.save();
     this.ctx.fillStyle = this.color;
@@ -182,7 +162,30 @@ export class UI {
     
         this.ctx.restore();
     }
-    
+
+    gameOver() {
+        this.ctx.save();
+        this.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
+        this.ctx.fillStyle = this.color;
+        const lineHeight = this.fontSize + 20;
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.8;
+        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.restore();
+        this.ctx.textAlign = 'center';
+        let message = 'Gra Skończona - Tabela Wyników';
+        this.ctx.fillText(message, this.canvas.width * 0.5, this.canvas.height * 0.3 - lineHeight);
+
+        const leaderBoard = Object.values(this.game.players).sort((a, b) => b.score - a.score);
+        for (let i = 0; i < leaderBoard.length; i++) {
+            const player = leaderBoard[i];
+            let playerStats = `${i + 1}. ${player.nickname} - Kills: ${player.kills}, Deaths: ${player.deaths}, Score: ${player.score}, Territory: ${player.territory}%`;
+            this.ctx.fillText(playerStats, this.canvas.width * 0.5, this.canvas.height * 0.3 + (i + 1) * lineHeight);
+        }
+
+        this.ctx.restore();
+    }
 
     getScoreboardHeight(sortedPlayers) {
         const playerCount = sortedPlayers.length;

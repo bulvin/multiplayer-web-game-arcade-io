@@ -28,9 +28,9 @@ export class GameMap {
                 const y = row * tileSize - cameraY;
                 const tile = this.tiles[row][col];
                 const playerId = tile.playerId;
-                if (tile.hasTail ) {
-                    context.fillStyle = 'hsl(0, 100%, 50%)'; 
-                }  else if (playerId !== 0) {
+                if (playerId === 0) {
+                    context.fillStyle = '#111';
+                } else if (playerId !== 0) {
                     let player;
                     for (const id in players) {
                         const frontendPlayer = players[id];
@@ -42,11 +42,12 @@ export class GameMap {
                     if (player) {
                         context.fillStyle = player.color;
                     }
-                } else if (playerId === 0) {
-                    context.fillStyle = '#111'; 
-                } 
-               
-              
+                }
+
+                 if (tile.hasTail) {
+                    context.fillStyle = 'hsl(0, 100%, 50%)';
+                }
+
 
                 context.fillRect(x, y, tileSize, tileSize);
             }

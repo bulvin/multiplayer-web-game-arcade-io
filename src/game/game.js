@@ -6,7 +6,7 @@ export class Game {
     constructor(id, gameMap){
         this.id = id;
         this.map = gameMap;
-        this.gameTimer = 5000 * 60;
+        this.gameTimer = 1000;
         this.gameOver = false;
         this.abilitySpawnInterval = 30 * 1000;
         this.lastAbilitySpawnTimer = 0;
@@ -54,7 +54,7 @@ export class Game {
                 }
 
                 if (player.dead) {
-                   let messages = this.deadMessage(player.deadInterval, player.deadTimer)
+                   let messages = this.deadMessage(player.deadInterval, player.deadTimer);
                    socket.emit('deadMessage', { player: player.id, messages: messages } );
                 }
 
@@ -106,6 +106,9 @@ export class Game {
 
     deletePlayer(id) {
         const player = this.players[id];
+        if (player) {
+            player.clear();
+        }
         delete this.sockets[id];
         delete this.players[id];
         return player;
