@@ -12,14 +12,14 @@ export class Game {
         this.id = id;
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
-        this.map = new GameMap(map);
-        this.camera = new Camera(this);
         this.players = {};
         this.gameTimer = gameTimer;
         this.gameOver = false;
+        this.map = new GameMap(map, this);
+        this.camera = new Camera(this);
         this.abilities = [];
         this.bonuses = [];
-
+        
         window.addEventListener("resize", this.resizeCanvas.bind(this));
 
     }
@@ -72,8 +72,8 @@ export class Game {
     }
     draw() {
 
-        this.map.drawTiles(this.context, this.canvas, this.camera, this.players);
-        this.map.drawGrid(this.context, this.canvas, this.camera);
+        this.map.drawTiles();
+        this.map.drawGrid();
 
         for (const id in this.players) {
             const player = this.players[id]

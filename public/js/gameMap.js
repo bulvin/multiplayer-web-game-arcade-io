@@ -1,21 +1,22 @@
 export class GameMap {
-    constructor({rows, cols, tiles}) {
+    constructor({rows, cols, tiles}, game) {
         this.rows = rows;
         this.cols = cols;
         this.tileSize = 32;
         this.width = rows * this.tileSize;
         this.height = cols * this.tileSize;
+        this.game = game;
       
         this.tiles = tiles;
     }
-    drawTiles(context, canvas, camera, players) {
-        context.save();
+    drawTiles() {
+        this.game.context.save();
 
         const tileSize = this.tileSize * window.devicePixelRatio;
-        const cameraX = camera.x;
-        const cameraY = camera.y;
-        const viewportWidth = canvas.width;
-        const viewportHeight = canvas.height;
+        const cameraX = this.game.camera.x;
+        const cameraY = this.game.camera.y;
+        const viewportWidth = this.game.canvas.width;
+        const viewportHeight = this.game.canvas.height;
 
         const startX = Math.max(0, Math.floor(cameraX / tileSize));
         const startY = Math.max(0, Math.floor(cameraY / tileSize));
@@ -29,41 +30,41 @@ export class GameMap {
                 const tile = this.tiles[row][col];
                 const playerId = tile.playerId;
                 if (playerId === 0) {
-                    context.fillStyle = '#111';
+                    this.game.context.fillStyle = '#111';
                 } else if (playerId !== 0) {
                     let player;
-                    for (const id in players) {
-                        const frontendPlayer = players[id];
+                    for (const id in this.game.players) {
+                        const frontendPlayer = this.game.players[id];
                         if (id === playerId) {
                             player = frontendPlayer;
                             break;
                         }
                     }
                     if (player) {
-                        context.fillStyle = player.color;
+                        this.game.context.fillStyle = player.color;
                     }
                 }
 
                  if (tile.hasTail) {
-                    context.fillStyle = 'hsl(0, 100%, 50%)';
+                    this.game.context.fillStyle = 'hsl(0, 100%, 50%)';
                 }
 
 
-                context.fillRect(x, y, tileSize, tileSize);
+                this.game.context.fillRect(x, y, tileSize, tileSize);
             }
         }
-        context.restore();
+        this.game.context.restore();
     }
 
-    drawGrid(context, canvas, camera) {
+    drawGrid() {
         
-        context.beginPath();
+        this.game.context.beginPath();
 
         const tileSize = this.tileSize * window.devicePixelRatio;
-        const cameraX = camera.x;
-        const cameraY = camera.y;
-        const viewportWidth = canvas.width;
-        const viewportHeight = canvas.height;
+        const cameraX = this.game.camera.x;
+        const cameraY = this.game.camera.y;
+        const viewportWidth = this.game.canvas.width;
+        const viewportHeight = this.game.canvas.height;
 
         const startX = Math.max(0, Math.floor(cameraX / tileSize));
         const startY = Math.max(0, Math.floor(cameraY / tileSize));
@@ -78,50 +79,50 @@ export class GameMap {
         for (let i = startX; i < endX; i++) {
             const x = (i * tileSize) - cameraX;
             if (x >= mapStartX && x <= mapEndX) {
-                context.moveTo(x, mapStartY);
-                context.lineTo(x, mapEndY);
+                this.game.context.moveTo(x, mapStartY);
+                this.game.context.lineTo(x, mapEndY);
             }
         }
 
         for (let i = startY; i < endY; i++) {
             const y = (i * tileSize) - cameraY;
             if (y >= mapStartY && y <= mapEndY) {
-                context.moveTo(mapStartX, y);
-                context.lineTo(mapEndX, y);
+                this.game.context.moveTo(mapStartX, y);
+                this.game.context.lineTo(mapEndX, y);
             }
         }
 
-        context.lineWidth = 2;
-        context.strokeStyle = '#191919';
-        context.stroke();
+        this.game.context.lineWidth = 2;
+        this.game.context.strokeStyle = '#191919';
+        this.game.context.stroke();
 
-        this.#drawBorderMap(context, camera);
+        this.#drawBorderMap();
 
        
     }
 
-    #drawBorderMap(context, camera) {
+    #drawBorderMap() {
     
-        context.beginPath();
+        this.game.context.beginPath();
 
-        const lineWidth = 10;
-        const cameraX = camera.x;
-        const cameraY = camera.y;
+        const lineWidth = 20;
+        const cameraX = this.game.camera.x;
+        const cameraY = this.game.camera.y;
 
-        context.moveTo(0 - cameraX, 0 - cameraY);
-        context.lineTo(this.width - cameraX, 0 - cameraY);
-        context.moveTo(this.width - cameraX, 0 - cameraY);
-        context.lineTo(this.width - cameraX, this.height - cameraY);
-        context.moveTo(this.width - cameraX, this.height - cameraY);
-        context.lineTo(0 - cameraX, this.height - cameraY);
-        context.moveTo(0 - cameraX, this.height - cameraY);
-        context.lineTo(0 - cameraX, 0 - cameraY);
+        this.game.context.moveTo(0 - cameraX, 0 - cameraY);
+        this.game.context.lineTo(this.width - cameraX, 0 - cameraY);
+        this.game.context.moveTo(this.width - cameraX, 0 - cameraY);
+        this.game.context.lineTo(this.width - cameraX, this.height - cameraY);
+        this.game.context.moveTo(this.width - cameraX, this.height - cameraY);
+        this.game.context.lineTo(0 - cameraX, this.height - cameraY);
+        this.game.context.moveTo(0 - cameraX, this.height - cameraY);
+        this.game.context.lineTo(0 - cameraX, 0 - cameraY);
 
-        context.lineWidth = lineWidth;
-        context.strokeStyle = 'darkred';
-        context.lineCap = 'round';
-        context.setLineDash([]);
-        context.stroke();
+        this.game.context.lineWidth = lineWidth;
+        this.game.context.strokeStyle = 'darkred';
+        this.game.context.lineCap = 'round';
+        this.game.context.setLineDash([]);
+        this.game.context.stroke();
 
     }
    

@@ -6,7 +6,7 @@ export class Game {
     constructor(id, gameMap){
         this.id = id;
         this.map = gameMap;
-        this.gameTimer = 1000;
+        this.gameTimer = 5000 * 60;
         this.gameOver = false;
         this.abilitySpawnInterval = 30 * 1000;
         this.lastAbilitySpawnTimer = 0;
