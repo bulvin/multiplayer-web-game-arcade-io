@@ -406,6 +406,7 @@ export class Player {
             territory: territory,
             abilities: this.abilitiesBinds,
             bonus: this.activeBonus,
+            activeAbility: this.activeAbility,
         };
     }
 }

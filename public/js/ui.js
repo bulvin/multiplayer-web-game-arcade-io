@@ -200,8 +200,12 @@ export class UI {
                 this.ctx.fillText(ability.name, textX, textY);
             }
           
+          
             this.font = `${this.fontSize - 15}px ${this.fontFamily}`;
             this.ctx.fillText(key, textX, textY - 15);
+            if (this.player.activeAbility) {
+                this.ctx.fillText(`${Math.ceil(this.player.activeAbility.duration * 0.001) }s.`, textX, textY + 25);
+            }
             textX = textX + this.game.map.tileSize + index * this.game.map.tileSize; 
             index++;
             
@@ -214,7 +218,8 @@ export class UI {
         this.ctx.fillStyle = this.color;
         if (this.player.bonus) {
             this.ctx.fillText(this.player.bonus.name, x + this.game.map.tileSize * 8, y + this.game.map.tileSize);
-            this.ctx.fillText(`${Math.ceil(this.player.bonus.duration * 0.001) }`, x + this.game.map.tileSize * 8, y + this.game.map.tileSize * 1.5);
+            this.ctx.fontSize = 10;
+            this.ctx.fillText(`${Math.ceil(this.player.bonus.duration * 0.001) }s.`, x + this.game.map.tileSize * 8, y + this.game.map.tileSize * 1.8);
         }
      
    

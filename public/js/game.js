@@ -48,6 +48,7 @@ export class Game {
                 clientPlayer.posLeaderboard = backendPlayer.posLeaderboard;
                 clientPlayer.abilities = backendPlayer.abilities;
                 clientPlayer.bonus = backendPlayer.bonus;
+                clientPlayer.activeAbility = backendPlayer.activeAbility;
              
                 clientPlayer.target.x = backendPlayer.x;
                 clientPlayer.target.y = backendPlayer.y;
