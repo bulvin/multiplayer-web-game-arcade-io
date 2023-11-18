@@ -23,7 +23,7 @@ export class Player {
         this.deaths = 0;
         this.abilitiesBinds = {};
         this.activeAbility = null;
-        this.bonuses = [];
+        this.activeBonus = null;
 
         this.initBase();
 
@@ -47,15 +47,13 @@ export class Player {
         else {
             this.checkTakeEffects();
 
-            const ability = this.useAbility();
-            if (ability) {
-                this.activeAbility = ability;
-            }
+         
 
             if (Number.isInteger(this.x / this.psize) && Number.isInteger(this.y / this.psize)) {
                 let col = this.game.map.getCol(this.x);
                 let row = this.game.map.getRow(this.y);
                 let land = this.game.map.getTile(row, col);
+
 
                 if (this.input.length > 0) this.setDirection();
 
@@ -104,6 +102,11 @@ export class Player {
                     this.tail = [];
                 }
 
+                const ability = this.useAbility();
+                if (ability) {
+                    this.activeAbility = ability;
+                }
+
             }
             if (this.direction === Direction.Up) {
                 this.y -= this.speed;
@@ -122,14 +125,19 @@ export class Player {
 
             }
             
-
-
         }
-        if (this.activeAbility && this.activeAbility.duration > 0) {
+        if (this.activeAbility) {
             this.activeAbility.duration -= deltaTime;
 
             if (this.activeAbility.duration <= 0) {
                 this.resetAbilityEffects();
+            }
+        }
+        if (this.activeBonus) {
+            this.activeBonus.duration -= deltaTime;
+
+            if (this.activeBonus.duration <= 0) {
+                this.resetBonusEffect();
             }
         }
 
@@ -305,17 +313,25 @@ export class Player {
     }
     useAbility() {
 
+        let abilityKey = null;
         if (this.input.includes(Keys.R)) {
-            if (this.abilitiesBinds[Keys.R]) {
+            abilityKey = Keys.R;
+        } else if (this.input.includes(Keys.T)) {
+            abilityKey = Keys.T;
+        } else if (this.input.includes(Keys.E)) {
+            abilityKey = Keys.E;
+        }
 
-                const ability = this.abilitiesBinds[Keys.R];
-                if (ability.name === 'Speed') {
+        if (abilityKey && this.abilitiesBinds[abilityKey]) {
+            const ability = this.abilitiesBinds[abilityKey];
+            switch (ability.name) {
+                case 'Speed':
                     this.speed = 8;
-                    
-                }
-                return ability;
+                    break;
+            
+                
             }
-
+            return ability;
         }
         return null;
     }
@@ -343,6 +359,13 @@ export class Player {
         } else if (bonus.name === 'x8') {
             this.multiplyScore = 8;
         }
+        this.activeBonus = bonus;
+    }
+    resetBonusEffect(){
+        if (this.activeBonus.name === 'x2' || this.activeBonus.name === 'x4' || this.activeBonus.name === 'x8') {
+            this.multiplyScore = 1;
+        }
+        this.activeBonus = null;
     }
     initBase() {
         this.spawn();
@@ -366,7 +389,6 @@ export class Player {
         this.input = input;
     }
 
-
     getCountTiles() {
         return this.lands.length;
     }
@@ -382,6 +404,8 @@ export class Player {
             kills: this.kills,
             deaths: this.deaths,
             territory: territory,
+            abilities: this.abilitiesBinds,
+            bonus: this.activeBonus,
         };
     }
 }
@@ -392,7 +416,8 @@ const Keys = {
     A: 'a',
     D: 'd',
     R: 'r',
-    T: 't'
+    T: 't',
+    E: 'e'
 }
 
 const Direction = {

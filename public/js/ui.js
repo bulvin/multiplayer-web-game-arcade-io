@@ -29,6 +29,7 @@ export class UI {
             this.updateTimer();
             this.drawScoreBoard();
             this.drawStats();
+            this.drawAbilitiesUI();
               
             if (this.messages.length > 0) {
                 this.drawDeadMessage(this.messages[0], this.messages[1]);
@@ -142,9 +143,10 @@ export class UI {
         this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
     
         const lineHeight = this.fontSize + 10;
-        const x = 10;
+        const x = this.canvas.width * 0.01;
         let y = this.canvas.height - lineHeight;
-    
+        
+        this.ctx.textAlign = 'left';
         this.ctx.fillText(`Liczba zabójstw: ${this.player.kills}`, x, y);
         y -= lineHeight;
     
@@ -160,6 +162,62 @@ export class UI {
       
         this.ctx.fillText(`Pozycja w leaderboardzie: ${this.getLeaderboardPosition(this.player)}`, x, y);
     
+        this.ctx.restore();
+    }
+
+
+    drawAbilitiesUI(){
+        this.ctx.save();
+
+        let x = this.canvas.width * 0.8;
+        let y = this.canvas.height - 80;
+        const borderWidth = 0.3;
+        const borderColor = 'white';
+        const countAbilities = 3;
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = borderWidth;
+        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
+        this.ctx.font = `${this.fontSize - 10}px ${this.fontFamily}`;
+        this.ctx.save();
+       
+         
+        for (let i = 0; i < countAbilities; i++) {
+            this.ctx.fillRect(x + i * this.game.map.tileSize * 2, y , this.game.map.tileSize * 2, this.game.map.tileSize * 2);
+            this.ctx.strokeRect(x + i * this.game.map.tileSize * 2 , y, this.game.map.tileSize * 2, this.game.map.tileSize * 2);
+        }
+ 
+        this.ctx.restore();
+        let textX = x + this.game.map.tileSize;
+        const textY = y + this.game.map.tileSize;
+      
+        let index = 1;
+        this.ctx.fillStyle = this.color;
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Umiejętności', textX + this.game.map.tileSize * 2, textY - 30); 
+        for (const key of Object.keys(this.player.abilities)) {
+            const ability = this.player.abilities[key];
+            if (ability) {
+                this.ctx.fillText(ability.name, textX, textY);
+            }
+          
+            this.font = `${this.fontSize - 15}px ${this.fontFamily}`;
+            this.ctx.fillText(key, textX, textY - 15);
+            textX = textX + this.game.map.tileSize + index * this.game.map.tileSize; 
+            index++;
+            
+        }
+        textX = x + this.game.map.tileSize * 8;
+        this.ctx.fillText('Bonus', textX , textY - 30); 
+        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
+        this.ctx.fillRect(x + this.game.map.tileSize * 7, y, this.game.map.tileSize * 2, this.game.map.tileSize * 2)
+        this.ctx.strokeRect(x + this.game.map.tileSize * 7, y, this.game.map.tileSize * 2, this.game.map.tileSize * 2)
+        this.ctx.fillStyle = this.color;
+        if (this.player.bonus) {
+            this.ctx.fillText(this.player.bonus.name, x + this.game.map.tileSize * 8, y + this.game.map.tileSize);
+            this.ctx.fillText(`${Math.ceil(this.player.bonus.duration * 0.001) }`, x + this.game.map.tileSize * 8, y + this.game.map.tileSize * 1.5);
+        }
+     
+   
         this.ctx.restore();
     }
 

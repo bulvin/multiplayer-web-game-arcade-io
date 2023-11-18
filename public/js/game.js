@@ -21,6 +21,7 @@ export class Game {
         this.bonuses = [];
         
         window.addEventListener("resize", this.resizeCanvas.bind(this));
+        this.canvas.addEventListener("wheel", (event) => event.preventDefault());
 
     }
     update(gameData) {
@@ -33,7 +34,7 @@ export class Game {
                 delete this.players[playerID];
             }
         }
-
+        
         for (const playerId in gameData.players) {
             const backendPlayer = gameData.players[playerId];
             
@@ -45,8 +46,9 @@ export class Game {
                 clientPlayer.territory = backendPlayer.territory;
                 clientPlayer.score = backendPlayer.score;
                 clientPlayer.posLeaderboard = backendPlayer.posLeaderboard;
-            
-                
+                clientPlayer.abilities = backendPlayer.abilities;
+                clientPlayer.bonus = backendPlayer.bonus;
+             
                 clientPlayer.target.x = backendPlayer.x;
                 clientPlayer.target.y = backendPlayer.y;
 
@@ -68,7 +70,6 @@ export class Game {
 
         }
 
-
     }
     draw() {
 
@@ -88,7 +89,8 @@ export class Game {
             }
             if (player === this.camera.targetPlayer) {
                 player.ui.draw();
-            }
+                
+            } 
             
         }
 

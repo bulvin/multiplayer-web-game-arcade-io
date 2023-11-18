@@ -55,7 +55,7 @@ export class Game {
 
                 if (player.dead) {
                    let messages = this.deadMessage(player.deadInterval, player.deadTimer);
-                   socket.emit('deadMessage', { player: player.id, messages: messages } );
+                   socket.emit('deadMessage', { messages: messages } );
                 }
 
             }

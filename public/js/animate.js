@@ -34,12 +34,7 @@ window.addEventListener("load", function () {
 
 });
 
-
 export function lerp(start, end, lerpFactor) {
   return start + (end - start) * lerpFactor;
 }
-
-canvas.addEventListener("wheel", (event) => {
-  event.preventDefault();
-});
 

@@ -10,7 +10,8 @@ export class Player {
         this.color = color;
         this.dead = dead;
         this.input = [];
-        this.abilities = [];
+        this.abilities = {};
+        
         this.target = {
             x: x,
             y: y,

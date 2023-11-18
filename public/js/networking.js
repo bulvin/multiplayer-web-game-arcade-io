@@ -27,7 +27,7 @@ socket.on('updateGame', (backendGame, timestamp) => {
       if (frontendGame.players[socket.id]) {
           const localPlayer = frontendGame.players[socket.id];
           frontendGame.camera.setTargetPlayer(localPlayer);
-          // localPlayer.ui.setStats(localPlayer);
+         
       }
       frontendGame.update(backendGame, timestamp);
   } else {
@@ -53,7 +53,7 @@ socket.on('deadMessage', (data) => {
   for (const i in gameManager.games) {
     const game = gameManager.games[i];
 
-    game.players[data.player].ui.setMessages(data.messages);
+    game.players[socket.id].ui.setMessages(data.messages);
   }
 });
 
