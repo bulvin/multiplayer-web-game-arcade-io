@@ -1,23 +1,214 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-    background-color: #F3F4F6;
-    font-size: 16px;
-    overflow: hidden;
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-size: 28px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background-color: #282c34;
+  color: #fff;
+  font-family: "Bangers", cursive;
+  letter-spacing: 2px;
+  overflow-y: auto;
+}
+
+#game-map {
+  background-color: #5db2d3;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#centered-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+#nickname-section {
+  margin-bottom: 20px;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+#nickname {
+  border: none;
+  padding: 12px;
+  border-radius: 20px;
+  background: #475569;
+  color: #cbd5e1;
+}
+
+#send-nickname {
+  border: none;
+  border-radius: 5px;
+  background-color: #61dafb;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: none;
+  background-image: linear-gradient(
+    to right,
+    rgb(6, 182, 212),
+    rgb(59, 130, 246)
+  );
+  color: white;
+  cursor: pointer;
+}
+
+#rooms {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  overflow-y: auto;
+  margin: auto;
+  justify-content: center;
+}
+
+#rooms-table {
+  width: 80vw;
+  border-collapse: collapse;
+  overflow-x: auto;
+  margin: auto;
+  text-align: left;
+}
+#rooms-header th {
+  background-image: linear-gradient(
+    to right,
+    rgb(6, 182, 212),
+    rgb(59, 130, 246)
+  );
+  color: #fff;
+  padding: 10px;
+}
+
+#rooms-table th,
+#rooms-table td {
+  padding: 10px;
+}
+
+#rooms-table tr:nth-child(even) {
+  background-color: #444;
+}
+
+#rooms-table tr:hover {
+  background-color: #414141;
+}
+
+#rooms p {
+  text-align: center;
+}
+
+.join-button,
+#create-room {
+  background-color: #66be79;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-family: "Bangers", cursive;
+  font-size: 32px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 100px;
+}
+
+#lobby {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+}
+
+.section-game-info,
+.section-game,
+.section-chat {
+  flex: 1;
+  margin: 10px;
+  padding: 20px;
+  border: 5px solid #f2f2f2;
+  border-radius: 10px;
+}
+
+#players-list {
+    margin-left: 50px;
+}
+
+.subheading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+  .chat {
+    flex: 2;
+  }
+  
+  .chat-submit-btn {
+    flex: 1;
+    border: none;
+    border-radius: 5px;
+    background-color: #61dafb;
+    padding: 10px 20px;
+    border-radius: 100px;
+    border: none;
+    background-image: linear-gradient(
+      to right,
+      rgb(6, 182, 212),
+      rgb(59, 130, 246)
+    );
+    color: white;
+    cursor: pointer;
+    font-family: "Bangers", cursive;
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+  
+  .chat-messages {
+    height: 80vh;
+    overflow-y: scroll;
+  }
+
+  .message {
+    margin-bottom: 10px;
+  }
+  
+  .chat-form {
+    align-self: center;
+    display: flex;
     width: 100%;
-    height: 100%;
+    justify-content: space-between; 
+  }
+
+  .form-input {
+    border: none;
+    padding: 12px;
+    border-radius: 20px;
+    background: #475569;
+    color: #cbd5e1;
+    width: 80%; 
+    margin-right: 12px;
+  }
+
+@media screen and (max-width: 600px) {
+  #lobby {
+    flex-direction: column;
+  }
+  .section-game-info,
+  .section-game,
+  .section-chat {
+    height: auto;
+  }
 }
-
-
-#game-map{
-
-    background-color: #5db2d3;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-}
-

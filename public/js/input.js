@@ -8,14 +8,14 @@ export class InputHandler {
             e.preventDefault();
             if (['w', 's', 'a', 'd', 'r', 't', 'e'].includes(e.key) && !this.player.input.includes(e.key) && !this.player.dead) {
                 this.player.input.push(e.key);
-                sendPlayerInput(this.player.input)
+                sendPlayerInput(this.player.input);
             }
         });
 
         window.addEventListener('keyup', (e) => {
             if (this.player.input.includes(e.key)) {
                 this.player.input.splice(this.player.input.indexOf(e.key), 1);
-                sendPlayerInput(this.player.input)
+                sendPlayerInput(this.player.input);
             }
         });
 

@@ -35,5 +35,4 @@ export class Player {
         this.game.context.restore();
 
     }
-
 }

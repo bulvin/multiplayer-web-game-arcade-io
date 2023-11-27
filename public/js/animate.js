@@ -1,16 +1,12 @@
-import { enterNickname } from "./networking.js";
 import { gameManager } from "./gameManager.js";
-
 
 export const canvas = document.getElementById("game-map");
 const ctx = canvas.getContext('2d');
 const devicePixelRatio = window.devicePixelRatio || 1;
 
 
-
 function animate() {
-  requestAnimationFrame(animate);
-
+ 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const id in gameManager.games) {
@@ -20,16 +16,17 @@ function animate() {
     game.draw();
 
   }
+  requestAnimationFrame(animate);
   
 }
-animate();
+animate(0);
 
 let countNickname = 1;
 window.addEventListener("load", function () {
   canvas.width = window.innerWidth * devicePixelRatio;
   canvas.height = window.innerHeight * devicePixelRatio;
 
-  enterNickname(`Player${countNickname}`);
+ // enterNickname(`Player${countNickname}`);
   countNickname++;
 
 });

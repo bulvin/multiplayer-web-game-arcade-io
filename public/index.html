@@ -2,26 +2,87 @@
 <html lang="pl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKILL IO Game</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IO Game</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
 </head>
 
 <body>
+  <div id="centered-content">
+    <form id="nickname-section">
+      <input type="text" id="nickname" placeholder="Wprowadź swój pseudonim">
+      <button id="send-nickname" type="submit">Ok</button>
+    </form>
 
-    <canvas id="game-map">
-       
+    <div id="rooms">
+      <p id="title-rooms">Lista pokoi gry</p>
+      <table id="rooms-table">
+        <thead id="rooms-header">
+          <th>Nazwa pokoju</th>
+          <th>Gracze</th>
+          <th><button id="create-room" class="join-button">+ Stwórz pokój</button></th>
+        </thead>
+        <tbody id="roomList"></tbody>
+      </table>
+    </div>
+
+
+
+
+    <main id="lobby" style="display: none;">
+      <section class="section-game-info">
+        <h2 class="subheading">
+          Informacje o grze
+        </h2>
+        <h3 id="room-info">Pokój: </h3>
+        <h3>Gracze:</h3>
+        <ul id="players-list">
+
+        </ul>
+      </section>
+
+      <section class="section-game">
+        <h2 class="subheading">Wybór trybu gry</h2>
+
+        <form class="game-form">
+          <input class="btn game-submit-btn" type="submit" value="send" disabled />
+        </form>
+        <button class="btn start-btn">START</button>
+      </section>
+
+      <section class="section-chat">
+        <h2 class="subheading">chat</h2>
+        <div class="chat-messages">
+
+        </div>
+        <form class="chat-form">
+          <input class="form-input chat-message" name="message" placeholder="Napisz wiadomość..." autocomplete="off"
+            required />
+          <input class="btn chat-submit-btn" type="submit" value="Wyślij" />
+        </form>
+      </section>
+    </main>
+
+    <canvas id="game-map" style="display: none;">
+
     </canvas>
-   
+  </div>
 
-    <script type="module" src="js/animate.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
+
+  <script type="module" src="js/animate.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
 </body>
 
 </html>
