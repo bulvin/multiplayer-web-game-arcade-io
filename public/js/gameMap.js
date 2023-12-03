@@ -29,25 +29,29 @@ export class GameMap {
                 const y = row * tileSize - cameraY;
                 const tile = this.tiles[row][col];
                 const playerId = tile.playerId;
+                let player;
                 if (playerId === 0) {
-                    this.game.context.fillStyle = '#111';
+                    this.game.context.fillStyle = '#111'
                 } else if (playerId !== 0) {
-                    let player;
+                   
                     for (const id in this.game.players) {
                         const frontendPlayer = this.game.players[id];
                         if (id === playerId) {
                             player = frontendPlayer;
                             break;
                         }
-                    }
+                    } 
+                    
                     if (player) {
                         this.game.context.fillStyle = player.color;
-                    }
+                    } 
+                  
                 }
 
                  if (tile.hasTail) {
                     this.game.context.fillStyle = 'hsl(0, 100%, 50%)';
-                }
+                } 
+                
 
 
                 this.game.context.fillRect(x, y, tileSize, tileSize);

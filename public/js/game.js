@@ -41,6 +41,7 @@ export class Game {
             if (this.players[playerId]) {
                 const clientPlayer = this.players[playerId];
                 clientPlayer.dead = backendPlayer.dead;
+                clientPlayer.slowMultiplier = backendPlayer.slowMultiplier;
                 clientPlayer.kills = backendPlayer.kills;
                 clientPlayer.deaths = backendPlayer.deaths;
                 clientPlayer.territory = backendPlayer.territory;
@@ -49,6 +50,7 @@ export class Game {
                 clientPlayer.abilities = backendPlayer.abilities;
                 clientPlayer.bonus = backendPlayer.bonus;
                 clientPlayer.activeAbility = backendPlayer.activeAbility;
+                clientPlayer.invisible = backendPlayer.invisible;
              
                 clientPlayer.target.x = backendPlayer.x;
                 clientPlayer.target.y = backendPlayer.y;

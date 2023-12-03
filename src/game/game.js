@@ -8,18 +8,17 @@ export class Game {
         this.map = gameMap;
         this.gameTimer = 5000 * 60;
         this.gameOver = false;
-        this.abilitySpawnInterval = 30 * 1000;
+        this.abilitySpawnInterval = 1000;
         this.lastAbilitySpawnTimer = 0;
         this.bonusSpawnInterval = 30 * 1000;
         this.lastBonusSpawnTimer = 0;
         this.abilities = [];
         this.bonuses = [];
         this.players = {};
-        this.sockets = {};
+      
 
-        this.init();
     }
-    update(deltaTime) {
+    update(deltaTime, currentTime) {
      
         if (this.gameTimer >= 0){
        
@@ -41,7 +40,7 @@ export class Game {
 
             for (const id in this.players){
                 const player = this.players[id];
-                const socket = this.sockets[id];
+                // const socket = this.sockets[id];
 
                 player.update(deltaTime);
            
@@ -52,10 +51,12 @@ export class Game {
                       
                     }
                 }
+                
+            
 
                 if (player.dead) {
                    let messages = this.deadMessage(player.deadInterval, player.deadTimer);
-                   socket.emit('deadMessage', { messages: messages } );
+                   player.user.socket.emit('deadMessage', { messages: messages } );
                 }
 
             }
@@ -63,12 +64,12 @@ export class Game {
         } else{
             this.gameOver = true;
         }
-    
+        
     }
 
 
     spawnAbility(){
-        const abilities = ['Speed', 'Bigger'] ; 
+        const abilities = ['Invisible'] ; 
         const randomIndex = Math.floor(Math.random() * abilities.length);
         const randomNames = abilities[randomIndex];
         const duration = 5000;
@@ -96,11 +97,10 @@ export class Game {
         this.bonuses.push(bonus)
 
     }
-    addPlayer(socket, username) {
-        this.sockets[socket.id] = socket;
+    addPlayer(player) {
+        // this.sockets[socket.id] = socket;
 
-        const player = new Player(socket.id, username, this);
-        this.players[socket.id] = player;
+        this.players[player.user.id] = player;
         return player;
     }
 
@@ -109,7 +109,6 @@ export class Game {
         if (player) {
             player.clear();
         }
-        delete this.sockets[id];
         delete this.players[id];
         return player;
     }
@@ -120,6 +119,7 @@ export class Game {
     init() {
        for (const id in this.players){
             const player = this.players[id];
+       
             player.initBase();
        }
     }
@@ -156,5 +156,8 @@ export class Game {
             players: backendPlayers,
         };
     }
+
    
 }
+   
+

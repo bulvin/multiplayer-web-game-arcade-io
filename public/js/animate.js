@@ -6,28 +6,25 @@ const devicePixelRatio = window.devicePixelRatio || 1;
 
 
 function animate() {
- 
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const id in gameManager.games) {
     const game = gameManager.games[id];
-
+   
     game.camera.update();
     game.draw();
-
+   
   }
+
   requestAnimationFrame(animate);
-  
 }
 animate(0);
 
-let countNickname = 1;
+
 window.addEventListener("load", function () {
   canvas.width = window.innerWidth * devicePixelRatio;
   canvas.height = window.innerHeight * devicePixelRatio;
-
- // enterNickname(`Player${countNickname}`);
-  countNickname++;
 
 });
 

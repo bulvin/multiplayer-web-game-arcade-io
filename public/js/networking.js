@@ -2,7 +2,7 @@ import { gameManager } from "./gameManager.js";
 import { generateRooms } from "./index.js";
 import { updatePlayersinRoom } from "./index.js";
 
-const socket = io(`ws://${window.location.host}`);
+const socket = io(`${window.location.host}`, { transports: ["websocket"] });
 
 export function enterNickname(nickname) {
   socket.emit("join", nickname);
@@ -14,12 +14,11 @@ export function sendPlayerInput(input) {
 }
 
 export function createRoom(data, callback) {
-  const { name, maxPlayers, playerName } = data;
+  const { name, maxPlayers } = data;
 
   socket.emit("createRoom", {
     name: name,
     maxPlayers: maxPlayers,
-    playerName: playerName,
   });
 
   socket.on("errorCreateRoom", (errorMessage) => {
@@ -27,16 +26,13 @@ export function createRoom(data, callback) {
   });
 }
 
-export function joinRoom(room, player) {
-  const data = {
-    room: room,
-    player: player,
-  };
-  console.log(data);
-  socket.emit("joinRoom", data);
+export function joinRoom(room) {
+ 
+  socket.emit("joinRoom", room);
 }
 
 socket.on("errorJoin", (errorMessage) => {
+  
   alert(errorMessage);
 });
 
@@ -47,8 +43,15 @@ socket.on("playerJoined", (player) => {
 socket.on("disconnected", (info) => {
   console.log(info);
 });
-
+let canvasDisplayed = false;
 socket.on("updateGame", (backendGame, timestamp) => {
+  
+  if (!canvasDisplayed) {
+    document.querySelector("#lobby").style.display = 'none';
+    document.querySelector("#game-map").style.display = 'block';
+    canvasDisplayed = true; 
+  }
+
   if (gameManager.games[backendGame.id]) {
     const frontendGame = gameManager.games[backendGame.id];
     if (frontendGame.players[socket.id]) {
@@ -113,5 +116,18 @@ socket.on("message", ({ playerName, text, createdAt }) => {
     ${text}
     </p>
   </div>`;
-  chatMessages.insertAdjacentHTML('beforeend', html);
+  chatMessages.insertAdjacentHTML('afterBegin', html);
+
+  console.log(`${playerName} + ${text}`)
 });
+
+export const sendMessage = (message) => {
+
+ socket.emit('receiveMessage', message);
+   
+}
+     
+export const startGame = () => {
+  socket.emit('startGame');
+}
+

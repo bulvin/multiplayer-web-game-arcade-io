@@ -1,9 +1,8 @@
-export class Player {
+export class Player  {
 
-    constructor(id, nickname, game) {
+    constructor(user, game) {
 
-        this.id = id;
-        this.nickname = nickname;
+        this.user = user;
         this.game = game;
         this.psize = 32;
         this.x = 0;
@@ -24,9 +23,8 @@ export class Player {
         this.abilitiesBinds = {};
         this.activeAbility = null;
         this.activeBonus = null;
-
-        this.initBase();
-
+        this.slowMultiplier = 1;
+        this.invisible = false;
     }
 
     update(deltaTime) {
@@ -34,22 +32,20 @@ export class Player {
         let setlands;
 
         if (this.dead) {
-
+          
             if (this.deadTimer > this.deadInterval) {
                 this.dead = false;
                 this.direction = -1;
                 this.deadTimer = 0;
+                this.input = [];
                 this.initBase();
             } else {
                 this.deadTimer += deltaTime;
             }
         }
         else {
-            this.checkTakeEffects();
-
-         
-
-            if (Number.isInteger(this.x / this.psize) && Number.isInteger(this.y / this.psize)) {
+           
+            if (Number.isInteger(this.x / this.game.map.tileSize ) && Number.isInteger(this.y / this.game.map.tileSize)) {
                 let col = this.game.map.getCol(this.x);
                 let row = this.game.map.getRow(this.y);
                 let land = this.game.map.getTile(row, col);
@@ -64,10 +60,10 @@ export class Player {
 
                 } 
 
-                if (land.playerId !== this.id && !this.dead) {
+                if (land.playerId !== this.user.id && !this.dead) {
                    this.addLandToTail(land); 
                 }
-                if (this.id === land.playerId && this.tail.length > 0) {
+                if (this.user.id === land.playerId && this.tail.length > 0) {
                     for (let i = 0; i < this.lands.length; i++) {
                         this.tail.push(this.lands[i]);
                     }
@@ -94,7 +90,7 @@ export class Player {
 
                     this.lands.push(...setlands);
                     this.lands.forEach(land => {
-                        land.playerId = this.id;
+                        land.playerId = this.user.id;
                         land.hasTail = false;
                     });
 
@@ -108,15 +104,17 @@ export class Player {
                 }
 
             }
+           
             if (this.direction === Direction.Up) {
-                this.y -= this.speed;
+                this.y -= this.speed * this.slowMultiplier;
             } else if (this.direction === Direction.Down) {
-                this.y += this.speed;
+                this.y += this.speed * this.slowMultiplier;
             } else if (this.direction === Direction.Right) {
-                this.x += this.speed;
+                this.x += this.speed * this.slowMultiplier;
             } else if (this.direction === Direction.Left) {
-                this.x -= this.speed;
+                this.x -= this.speed * this.slowMultiplier;
             }
+        
 
             if (this.isHitInBorders()) {
                 this.dead = true;
@@ -126,6 +124,7 @@ export class Player {
             }
             
         }
+        this.checkTakeEffects();
         if (this.activeAbility) {
             this.activeAbility.duration -= deltaTime;
 
@@ -176,10 +175,11 @@ export class Player {
 
     }
     addLandToTail(land) {
-        land.hasTail = true; 
+      
+    
+        land.hasTail = true;
         return this.tail.push(land);
     }
-
     gainPoints() {
   
        this.lands.forEach(land => this.score += land.score * this.multiplyScore);
@@ -191,13 +191,13 @@ export class Player {
 
         return percent.toFixed(1);
     }
-
     isHitSelf(squareTail) {
-        if (this.tail.includes(squareTail) && squareTail.x === this.x && squareTail.y === this.y) {
-
+        if (this.activeAbility && this.activeAbility.name === 'noHitSelf') {
+            return false;  
+        } else if (this.tail.includes(squareTail) && squareTail.x === this.x && squareTail.y === this.y) {
             return true;
         }
-
+    
         return false;
     }
     isHitInBorders() {
@@ -224,6 +224,7 @@ export class Player {
                 square.playerId = 0;
                 square.hasTail = false;
             });
+            this.direction = -1;
         }
 
             this.tail.forEach(square => {
@@ -324,13 +325,26 @@ export class Player {
 
         if (abilityKey && this.abilitiesBinds[abilityKey]) {
             const ability = this.abilitiesBinds[abilityKey];
-            switch (ability.name) {
-                case 'Speed':
-                    this.speed = 8;
-                    break;
-            
-                
+            if (ability.name === 'Speed') {
+                this.speed = 8;
+            } else if (ability.name === 'Slow') {
+                for (const id in this.game.players) {
+                    if (id !== this.user.id) {
+                        const otherPlayer = this.game.players[id];
+                        otherPlayer.slowMultiplier = 0.5;
+                    }
+                  
+                }
+            } else if (ability.name === 'Invisible') {
+                this.invisible = true;
+                this.color = '#111';
+                this.tail.forEach((tile) => {
+                    tile.color = '#111';
+                });
+           
+              
             }
+         
             return ability;
         }
         return null;
@@ -339,6 +353,19 @@ export class Player {
 
         if (this.activeAbility.name === 'Speed') {
             this.speed = 4;
+        } else if (this.activeAbility.name === 'Slow') {
+
+            for (const id in this.game.players) {
+                if (id !== this.user.id) {
+                    const otherPlayer = this.game.players[id];
+                    otherPlayer.slowMultiplier = 1;
+                }
+              
+            }
+        } else if (this.activeAbility.name === 'Invisible') {
+            this.tail.forEach((tile) => {
+                tile.color = 'hsl(0, 100%, 50%)';
+            });
         }
 
         for (const key of Object.keys(this.abilitiesBinds)) {
@@ -379,23 +406,30 @@ export class Player {
 
                 if (newRow >= 0 && newRow < this.game.map.rows && newCol >= 0 && newCol < this.game.map.cols) {
                     const spawnLand = this.game.map.getTile(newRow, newCol);
-                    spawnLand.playerId = this.id;
+                    spawnLand.playerId = this.user.id;
                     this.lands.push(spawnLand);
                 }
             }
         }
     }
     setInput(input) {
-        this.input = input;
-    }
+        const  inputKeys = ['w', 's', 'a', 'd', 'e', 'r', 't'];
+        const validatedInput = input.filter(key => inputKeys.includes(key));
 
+        if(validatedInput.length > 0) {
+            this.input = input;
+           
+        }
+   
+    }
+ 
     getCountTiles() {
         return this.lands.length;
     }
     toJSON() {
        const territory = this.getOwnPercentageOfMap();
         return {
-            nickname: this.nickname,
+            nickname: this.user.name,
             color: this.color,
             x: this.x,
             y: this.y,
@@ -407,6 +441,8 @@ export class Player {
             abilities: this.abilitiesBinds,
             bonus: this.activeBonus,
             activeAbility: this.activeAbility,
+            slowMultiplier: this.slowMultiplier,
+            invisible: this.invisible
         };
     }
 }

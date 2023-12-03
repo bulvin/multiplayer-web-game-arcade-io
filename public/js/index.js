@@ -1,6 +1,8 @@
 import { enterNickname } from "./networking.js";
 import { createRoom } from "./networking.js";
 import { joinRoom } from "./networking.js";
+import { sendMessage } from "./networking.js";
+import { startGame } from "./networking.js";
 
 const nickname = document.getElementById("nickname");
 const sendNickBtn = document.getElementById("send-nickname");
@@ -10,6 +12,7 @@ const canvas = document.getElementById("game-map");
 const titleRooms = document.getElementById("rooms-title");
 const content = document.getElementById("#centered-content");
 const rooms = document.getElementById("rooms");
+const start = document.querySelector(".start-btn");
 
 const createRoomBtn = document.getElementById("create-room");
 
@@ -35,7 +38,7 @@ export function generateRooms(rooms) {
     joinButton.classList.add("join-button");
 
     joinButton.addEventListener("click", () => {
-        joinRoom(room.name, nickname.value); 
+        joinRoom(room.name); 
 
         document.getElementById("lobby").style.display = "flex";
         document.getElementById("rooms").style.display = "none";
@@ -95,10 +98,13 @@ sendNickBtn.addEventListener("click", (e) => {
             if (error) {
               console.log(error);
               alert(error);
+             
               return;
             } else {
               document.getElementById("lobby").style.display = "flex";
+             
             }
+            setCurrentRoom(roomName);
           }
         );
         document.getElementById("lobby").style.display = "flex";
@@ -108,6 +114,34 @@ sendNickBtn.addEventListener("click", (e) => {
     });
   });
 });
+
+const chatForm = document.querySelector('.chat-form');
+chatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+ 
+  
+  const chatFormInput = chatForm.querySelector(".chat-message");
+  const chatFormButton = chatForm.querySelector(".chat-submit-btn");
+
+  chatFormButton.setAttribute("disabled", "disabled");
+
+  const message = event.target.elements.message.value;
+  
+  sendMessage(message);
+  chatFormButton.removeAttribute("disabled");
+  chatFormInput.value = "";
+  chatFormInput.focus();
+
+   
+});
+
+start.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  startGame();
+  canvas.style.display = 'block';
+  document.getElementById('lobby').style.display = 'none';
+})
 
 export function updatePlayersinRoom(data) {
     const listTemplate = document.getElementById('players-list');
@@ -120,4 +154,3 @@ export function updatePlayersinRoom(data) {
     });
     roomName.innerHTML = 'Pokój: ' + data.name; 
 }
-
