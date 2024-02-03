@@ -19,13 +19,15 @@ export class Game {
         this.camera = new Camera(this);
         this.abilities = [];
         this.bonuses = [];
-        
+
+        this.context.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);   
         window.addEventListener("resize", this.resizeCanvas.bind(this));
         this.canvas.addEventListener("wheel", (event) => event.preventDefault());
 
     }
     update(gameData) {
         this.map.tiles = gameData.map.tiles;
+        this.map.tileSize = gameData.map.tileSize;
         this.gameTimer = gameData.gameTimer;
         this.gameOver = gameData.gameOver;
 
@@ -34,10 +36,10 @@ export class Game {
                 delete this.players[playerID];
             }
         }
-        
+
         for (const playerId in gameData.players) {
             const backendPlayer = gameData.players[playerId];
-            
+
             if (this.players[playerId]) {
                 const clientPlayer = this.players[playerId];
                 clientPlayer.dead = backendPlayer.dead;
@@ -50,10 +52,11 @@ export class Game {
                 clientPlayer.abilities = backendPlayer.abilities;
                 clientPlayer.bonus = backendPlayer.bonus;
                 clientPlayer.activeAbility = backendPlayer.activeAbility;
-                clientPlayer.invisible = backendPlayer.invisible;
-             
-                clientPlayer.target.x = backendPlayer.x;
-                clientPlayer.target.y = backendPlayer.y;
+                clientPlayer.color = backendPlayer.color;
+                clientPlayer.tileColor = backendPlayer.tileColor;
+                clientPlayer.psize = backendPlayer.psize;
+
+                clientPlayer.updatePosition(backendPlayer.x, backendPlayer.y);
 
             } else {
 
@@ -81,45 +84,41 @@ export class Game {
 
         for (const id in this.players) {
             const player = this.players[id]
-           
-            if (player.dead === false) {
 
-                player.x = lerp(player.x, player.target.x, 0.5);
-                player.y = lerp(player.y, player.target.y, 0.5);
+            if (player.dead === false) {
 
                 player.draw();
 
             }
             if (player === this.camera.targetPlayer) {
                 player.ui.draw();
-                
-            } 
-            
+
+            }
+
         }
 
-            for (const i in this.abilities) {
-                const ability = this.abilities[i];
-                ability.draw();
-            }
+        for (const i in this.abilities) {
+            const ability = this.abilities[i];
         
-         
-            for (const i in this.bonuses) {
-                const bonus = this.bonuses[i];
-                bonus.draw();
-            }
+            ability.draw();
+        }
         
 
-       
+        for (const i in this.bonuses) {
+            const bonus = this.bonuses[i];
+            bonus.draw();
+        }
+
     }
     addPLayer(player, id) {
-       
+
         const frontendPlayer = new Player({
             nickname: player.nickname,
             color: player.color,
             x: player.x,
             y: player.y,
             dead: player.dead,
-       
+
         }, this);
 
         this.players[id] = frontendPlayer;
@@ -133,29 +132,30 @@ export class Game {
     }
     _receiveAbilityUpdate(abilityInfo) {
         const { name, position } = abilityInfo;
-
-        const frontendAbility = new Ability(this, name, abilityInfo.duration, position.x, position.y);
+        console.log(position);
+        const frontendAbility = new Ability(this, name, abilityInfo.duration, position.x * 32, position.y * 32);
         this.abilities.push(frontendAbility);
+        console.log(this.abilities);
 
     }
     _receiveBonusUpdate(bonusInfo) {
         const { name: bonusName, position: bonusPosition } = bonusInfo;
 
-        const frontendBonus = new Bonus(this, bonusName, bonusInfo.duration, bonusPosition.x, bonusPosition.y);
+        const frontendBonus = new Bonus(this, bonusName, bonusInfo.duration, bonusPosition.x * 32, bonusPosition.y * 32);
         this.bonuses.push(frontendBonus);
 
     }
     resizeCanvas() {
-       
+
         const devicePixelRatio = window.devicePixelRatio || 1;
         const newWidth = window.innerWidth * devicePixelRatio;
         const newHeight = window.innerHeight * devicePixelRatio;
-    
+
         this.canvas.width = newWidth;
         this.canvas.height = newHeight;
-       
+
         this.context.scale(devicePixelRatio, devicePixelRatio);
-    
+
         this.camera.setViewport(newWidth, newHeight);
     }
 

@@ -4,6 +4,7 @@ import rooms from "../utils/rooms.js";
 import { RoomController } from "../controllers/roomController.js";
 import games from "../utils/games.js";
 import { PlayerController } from "../controllers/playerController.js";
+import { GameController } from "../controllers/gameController.js";
 
 export class Network {
   constructor(io) {
@@ -11,9 +12,10 @@ export class Network {
     this.userControllers = new Map();
     this.roomControllers = new Map();
     this.playerControllers = new Map();
+    this.gameControllers = new Map();
  
     this.io.on("connection", (socket) => this.onConnection(socket));
-    // this.updateLoop();
+   
   }
 
   onConnection(socket) {
@@ -64,9 +66,8 @@ export class Network {
       if (roomController) {
         roomController.removeUser(socket.id);
 
-
         if (playerController) {
-          roomController.game.deletePlayer(socket.id);
+          roomController.room.game.deletePlayer(socket.id);
           this.playerControllers.delete(socket.id);
         }
       }
@@ -81,21 +82,24 @@ export class Network {
     const room = rooms.get(roomID);
   
     const game = games.add(room.data);
-  
-    room.game = game;
-
+   
+    const roomController = this.roomControllers.get(roomID);
+   
+   
+    const playerControllers = [];
     for (const id in game.players) {
       const player = game.players[id];
       const userController = this.userControllers.get(player.user.id);
       const playerController = new PlayerController(userController, player);
       this.playerControllers.set(player.user.id, playerController);
+      playerControllers.push(playerController); 
+
       
     }
     game.init();
-    const roomController = this.roomControllers.get(roomID);
-   
-   roomController.game = game;
-   roomController.startGameLoop();
+    const gameController = new GameController(game, roomController, playerControllers);
+    this.gameControllers.set(game.id, gameController);
+  
   }
 
   onKeydown(socket, input) {
@@ -124,11 +128,13 @@ export class Network {
       this.roomControllers.set(room.id, roomController);
 
       const userController = this.userControllers.get(socket.id);
-      userController.leaveCurrRoom();
-      userController.joinRoom(room.id);
-      roomController.addUser(userController.user);
-      
-      this.updateRooms();
+
+      if (userController) {
+        userController.leaveCurrRoom();
+        userController.joinRoom(room.id);
+        roomController.addUser(userController.user);
+        this.updateRooms();
+      }
 
   }
 
@@ -176,26 +182,5 @@ export class Network {
       return gameRoom;
   }
 
-  
-  updateLoop() {
-    let lastUpdateTime = performance.now();
 
-    setInterval(() => {
-      const currentTime = performance.now();
-      const deltaTime = currentTime - lastUpdateTime;
-      lastUpdateTime = currentTime;
-      const gamess = games.getAll();
-      if (games.getAll().length > 0) {
-        for (const game of gamess) {
-      
-          game.update(deltaTime);
-         
-          this.io.to(game.room).emit('updateGame', game.toJSON());
-        }
-      }
-      
-    }, 13);
-  }
-
- 
 }

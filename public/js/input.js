@@ -7,7 +7,7 @@ export class InputHandler {
         window.addEventListener('keydown', (e) => {
             e.preventDefault();
           
-            if (['w', 's', 'a', 'd', 'r', 't', 'e'].includes(e.key) && !this.player.input.includes(e.key) && !this.player.dead) {
+            if (['w', 's', 'a', 'd', 'r', 't', 'e'].includes(e.key) && !this.player.input.includes(e.key)) {
                 this.player.input.push(e.key);
                 sendPlayerInput(this.player.input);
             }

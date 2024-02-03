@@ -11,7 +11,7 @@ export class Ability {
     }
     draw() {
         const x = this.position.x - this.game.camera.x + this.game.map.tileSize / 2;
-        const y = this.position.y - this.game.camera.y + this.game.map.tileSize / 2 + Math.sin(performance.now() / 1000) * (this.game.map.tileSize / 4);
+        const y = this.position.y  - this.game.camera.y + this.game.map.tileSize / 2 + Math.sin(performance.now() / 1000) * (this.game.map.tileSize / 4);
     
         const circleColor = "white";
         const radius = this.game.map.tileSize / 2;

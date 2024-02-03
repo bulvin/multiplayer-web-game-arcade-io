@@ -2,8 +2,6 @@ export class RoomController {
     constructor(io, room) {
         this.io = io;
         this.room = room;
-        this.game = null;
-        this.gameLoopInterval = null;
     }
     addUser(user) {
         this.room.users.push(user);
@@ -16,7 +14,7 @@ export class RoomController {
             this.room.users.splice(index, 1)
             this.sendCurrentUsers();
           
-        } ;
+        }
     }
     getUser(id) {
         const user = this.users.find(user => user.id === id);
@@ -30,24 +28,6 @@ export class RoomController {
         });
         return currentUsers;
     }
-    startGameLoop() {
-        if (this.game) {
-          let lastTimestamp = performance.now();
-      
-          this.gameLoopInterval = setInterval(() => {
-            if (this.gameOver) {
-              clearInterval(this.gameLoopInterval);
-              return;
-            }
-      
-            const currentTime = performance.now();
-            const deltaTime = currentTime - lastTimestamp;
-      
-            this.game.update(deltaTime, currentTime);
-            this.io.to(this.room.id).emit('updateGame', this.game.toJSON(), currentTime);
-            lastTimestamp = currentTime;
-          }, 15); 
-        }
-      }
+    
 
 }

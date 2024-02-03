@@ -1,6 +1,7 @@
 import { Game } from "../game/game.js";
 import { GameMap } from "../game/gameMap.js";
 import { Player } from "../game/player.js";
+import { generateUuid } from "./generateUuid.js";
 
 class Games {
     constructor() {
@@ -8,19 +9,18 @@ class Games {
     }
     add(room) {
 
-
-        const gameMap = new GameMap(80, 80);
-        const game = new Game(room.id, gameMap);
-
+        const game = new Game(generateUuid(), new GameMap(80, 80));
+       
+        let color;
         room.users.forEach(user => {
-          
-            const player = new Player(user, game);
+            color =  game.colors.getColor();
+            const player = new Player(user, game, color);
             
             game.addPlayer(player);
         });
         game.room = room.id;
-        this.games.set(room.id, game);
-        
+        room.game = game;
+        this.games.set(game.id, game);
         return game;
     }
     get(id) {

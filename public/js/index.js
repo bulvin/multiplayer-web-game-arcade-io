@@ -68,8 +68,10 @@ sendNickBtn.addEventListener("click", (e) => {
     Swal.fire({
       title: "Stwórz pokój rozgrywki",
       html: `
-                <input id="room-name" class="swal2-input" placeholder="Nazwa pokoju">
+               <input id="room-name" class="swal2-input" placeholder="Nazwa pokoju">
+      
                 <select id="max-players" class="swal2-select">
+                    <option value="">Liczba graczy</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>

@@ -1,63 +1,36 @@
 export class GameMap {
-    constructor({rows, cols, tiles}, game) {
+    constructor({ rows, cols, tiles, tileSize }, game) {
         this.rows = rows;
         this.cols = cols;
-        this.tileSize = 32;
+        this.tileSize = tileSize;
         this.width = rows * this.tileSize;
         this.height = cols * this.tileSize;
         this.game = game;
-      
+
         this.tiles = tiles;
     }
     drawTiles() {
-        this.game.context.save();
-
         const tileSize = this.tileSize * window.devicePixelRatio;
         const cameraX = this.game.camera.x;
         const cameraY = this.game.camera.y;
         const viewportWidth = this.game.canvas.width;
         const viewportHeight = this.game.canvas.height;
-
+    
         const startX = Math.max(0, Math.floor(cameraX / tileSize));
         const startY = Math.max(0, Math.floor(cameraY / tileSize));
         const endX = Math.min(this.cols, Math.ceil((cameraX + viewportWidth) / tileSize));
         const endY = Math.min(this.rows, Math.ceil((cameraY + viewportHeight) / tileSize));
-
+    
         for (let row = startY; row < endY; row++) {
             for (let col = startX; col < endX; col++) {
                 const x = col * tileSize - cameraX;
                 const y = row * tileSize - cameraY;
                 const tile = this.tiles[row][col];
-                const playerId = tile.playerId;
-                let player;
-                if (playerId === 0) {
-                    this.game.context.fillStyle = '#111'
-                } else if (playerId !== 0) {
-                   
-                    for (const id in this.game.players) {
-                        const frontendPlayer = this.game.players[id];
-                        if (id === playerId) {
-                            player = frontendPlayer;
-                            break;
-                        }
-                    } 
-                    
-                    if (player) {
-                        this.game.context.fillStyle = player.color;
-                    } 
-                  
-                }
 
-                 if (tile.hasTail) {
-                    this.game.context.fillStyle = 'hsl(0, 100%, 50%)';
-                } 
-                
-
-
+                this.game.context.fillStyle = tile.color;
                 this.game.context.fillRect(x, y, tileSize, tileSize);
             }
         }
-        this.game.context.restore();
     }
 
     drawGrid() {
@@ -96,17 +69,19 @@ export class GameMap {
             }
         }
 
-        this.game.context.lineWidth = 2;
+        this.game.context.lineWidth = 3;
+        
         this.game.context.strokeStyle = '#191919';
         this.game.context.stroke();
 
-        this.#drawBorderMap();
 
-       
+        this.#drawBorderMap();
+        
+
     }
 
     #drawBorderMap() {
-    
+     
         this.game.context.beginPath();
 
         const lineWidth = 20;
@@ -125,10 +100,11 @@ export class GameMap {
         this.game.context.lineWidth = lineWidth;
         this.game.context.strokeStyle = 'darkred';
         this.game.context.lineCap = 'round';
-        this.game.context.setLineDash([]);
+
         this.game.context.stroke();
+       
 
     }
-   
+
 
 }

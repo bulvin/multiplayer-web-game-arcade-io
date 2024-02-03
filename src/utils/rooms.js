@@ -23,9 +23,7 @@ class Rooms {
             return new Result(false, null, "Proszę podać nazwę pokoju.");
         }
             
-          
-        const id = generateUuid();
-        const room = new Room(id, name.trim(), maxPlayers);
+        const room = new Room(generateUuid(), name.trim(), maxPlayers);
         this.rooms.push(room);
         
 

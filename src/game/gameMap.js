@@ -2,36 +2,31 @@ export class GameMap {
     constructor(rows, cols) {
         this.rows = rows;
         this.cols = cols;
-        this.tileSize = 32;
         this.width = cols * this.tileSize;
         this.height = rows * this.tileSize;
-        this.tiles = [];
+        this.tileSize = 32;
+        this.tiles = []; 
         this.initTiles();
-    
+     
     }
     getTile(row, col) {
         return this.tiles[row][col];
-    }
-    setTile(row, col, tile) {
-        this.tiles[row][col] = tile;
-    }
-    getRow(y) {
-        return Math.floor(y / this.tileSize);
-    }
-    
-    getCol(x) {
-        return Math.floor(x / this.tileSize);
-    }
+      }
+    setTile(x, y, playerId, color, isTail) {
+        const tile = this.getTile(y, x);
+        tile.playerId = playerId;
+        tile.color = color;
+        tile.hasTail = isTail;
+      }
     initTiles() {
 
-        let tileX = 0;
-        let tileY = 0;
         let pointsScale = 3;
         let scoreAreaCol = this.cols / 2;
         let scoreAreaRow = this.rows / 2;
         let scoreAreaStart = this.tileSize / 2;
         let points = 10;
 
+        let tile;
         for (let row = 0; row < this.rows; row++) {
             this.tiles[row] = [];
 
@@ -41,14 +36,15 @@ export class GameMap {
                     points = 10;
                     points *= pointsScale;
                 }
-                let tile = { x: tileX, y: tileY, playerId: 0, score: points, tileSize: this.tileSize, color: '#111', hasTail: false};
+
+                tile = new Tile(col, row, 0, points, 32, '#111', false);
+                  
                 this.tiles[row].push(tile);
-                tileX += this.tileSize;
+
 
             }
 
-            tileX = 0;
-            tileY += this.tileSize;
+       
         }
     }
 
@@ -68,3 +64,16 @@ export class GameMap {
     }
 
 }
+
+class Tile {
+    constructor(x, y, playerId, score, size, color, hasTail) {
+        this.x = x;
+        this.y = y;
+        this.playerId = playerId;
+        this.score = score;
+        this.size = size;
+        this.color = color;
+        this.hasTail = hasTail;
+    }
+}
+

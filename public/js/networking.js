@@ -2,7 +2,7 @@ import { gameManager } from "./gameManager.js";
 import { generateRooms } from "./index.js";
 import { updatePlayersinRoom } from "./index.js";
 
-const socket = io(`${window.location.host}`, { transports: ["websocket"] });
+const socket = io.connect(`${window.location.host}`, { transports: ["websocket"] });
 
 export function enterNickname(nickname) {
   socket.emit("join", nickname);
@@ -54,11 +54,9 @@ socket.on("updateGame", (backendGame, timestamp) => {
 
   if (gameManager.games[backendGame.id]) {
     const frontendGame = gameManager.games[backendGame.id];
-    if (frontendGame.players[socket.id]) {
-      const localPlayer = frontendGame.players[socket.id];
-      frontendGame.camera.setTargetPlayer(localPlayer);
-    }
+   
     frontendGame.update(backendGame, timestamp);
+    
   } else {
     const gameData = {
       id: backendGame.id,
@@ -89,7 +87,7 @@ socket.on("updateRooms", (rooms) => {
 });
 
 socket.on("currentPlayers", (data) => {
-  console.log(data);
+  
   updatePlayersinRoom(data);
 });
 
@@ -118,7 +116,6 @@ socket.on("message", ({ playerName, text, createdAt }) => {
   </div>`;
   chatMessages.insertAdjacentHTML('afterBegin', html);
 
-  console.log(`${playerName} + ${text}`)
 });
 
 export const sendMessage = (message) => {
@@ -130,4 +127,5 @@ export const sendMessage = (message) => {
 export const startGame = () => {
   socket.emit('startGame');
 }
+
 

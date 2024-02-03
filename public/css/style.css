@@ -44,17 +44,19 @@ input::placeholder {
 
 #nickname {
   border: none;
-  padding: 12px;
+  padding: 16px; 
   border-radius: 20px;
   background: #475569;
   color: #cbd5e1;
+  width: 300px; 
+  font-size: 16px;
 }
 
 #send-nickname {
   border: none;
   border-radius: 5px;
   background-color: #61dafb;
-  padding: 10px 20px;
+  padding: 14px 24px; 
   border-radius: 100px;
   border: none;
   background-image: linear-gradient(
@@ -64,8 +66,13 @@ input::placeholder {
   );
   color: white;
   cursor: pointer;
+  margin-left: 10px; 
+  font-size: 16px;
 }
-
+#nickname-section {
+  display: flex; 
+  align-items: center; 
+}
 #rooms {
   width: 100%;
   display: grid;
@@ -205,6 +212,44 @@ input::placeholder {
     margin-right: 12px;
   }
 
+  .start-btn { 
+    border: none;
+    border-radius: 5px;
+    background-color: #61dafb;
+    padding: 10px 20px;
+    border-radius: 100px;
+    border: none;
+    background-image: linear-gradient(
+      to right,
+      rgb(13, 212, 6),
+      rgb(59, 246, 159)
+    );
+   
+    color: white;
+    cursor: pointer;
+    font-family: "Bangers", cursive;
+    font-size: 26px;
+    letter-spacing: 2px;
+    text-align: center;
+   
+      margin: 20px auto; 
+      display: block; 
+    
+  }
+
+  .type-game-select {
+    padding: 10px; 
+    font-size: 16px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    outline: none; 
+    margin: 20px auto; 
+    font-size: 24px;
+    display: block; 
+    width: 100%;
+    font-family: "Bangers", cursive;
+    
+  }
 @media screen and (max-width: 600px) {
   #lobby {
     flex-direction: column;

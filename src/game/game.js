@@ -1,7 +1,7 @@
 import {Player} from "./player.js";
 import {Ability} from "./ability.js";
 import {Bonus} from "./bonus.js";
-
+import { ColorSystem } from "./color.js";
 export class Game {
     constructor(id, gameMap){
         this.id = id;
@@ -15,11 +15,15 @@ export class Game {
         this.abilities = [];
         this.bonuses = [];
         this.players = {};
-      
+        this.colors = new ColorSystem();
+        this.lastFrameTime = performance.now();
 
     }
-    update(deltaTime, currentTime) {
-     
+    update() {
+        const currentFrameTime = performance.now();
+        const deltaTime = currentFrameTime - this.lastFrameTime;
+        this.lastFrameTime = currentFrameTime;
+
         if (this.gameTimer >= 0){
        
             this.gameTimer -= deltaTime
@@ -41,7 +45,7 @@ export class Game {
             for (const id in this.players){
                 const player = this.players[id];
                 // const socket = this.sockets[id];
-
+                const socket = player.user.socket;
                 player.update(deltaTime);
            
                 for (const otherId in this.players) {
@@ -50,13 +54,12 @@ export class Game {
                         player.isSomeoneHitsMe(otherPlayer);
                       
                     }
+
                 }
                 
-            
-
                 if (player.dead) {
                    let messages = this.deadMessage(player.deadInterval, player.deadTimer);
-                   player.user.socket.emit('deadMessage', { messages: messages } );
+                   socket.emit('deadMessage', { messages: messages } );
                 }
 
             }
@@ -69,18 +72,19 @@ export class Game {
 
 
     spawnAbility(){
-        const abilities = ['Invisible'] ; 
+        const abilities = ['Prędkość','Spowolnienie', 'Powrót', 'noHitSelf'] ; 
         const randomIndex = Math.floor(Math.random() * abilities.length);
         const randomNames = abilities[randomIndex];
         const duration = 5000;
 
-        const col = this.map.getCol(Math.floor(Math.random() * this.map.width));
-        const row = this.map.getRow(Math.floor(Math.random() * this.map.height));
+        const col = Math.floor(Math.random() * this.map.cols);
+        const row = Math.floor(Math.random() * this.map.rows);
+        const tile = this.map.getTile(row, col);
 
-
-        const ability = new Ability(randomNames, duration, col * this.map.tileSize, row * this.map.tileSize);
-
+        const ability = new Ability(randomNames, duration, tile.x, tile.y);
+        
         this.abilities.push(ability);
+      
 
     }
     spawnBonus(){
@@ -88,11 +92,12 @@ export class Game {
         const randomIndex = Math.floor(Math.random() * bonuses.length);
         const randomName = bonuses[randomIndex];
 
-        const col = this.map.getCol(Math.floor(Math.random() * this.map.width));
-        const row = this.map.getRow(Math.floor(Math.random() * this.map.height));
+        const col = Math.floor(Math.random() * this.map.cols);
+        const row = Math.floor(Math.random() * this.map.rows);
+        const tile = this.map.getTile(row, col);
         
         const duration = 5000 * 2;
-        const bonus = new Bonus(col * this.map.tileSize, row * this.map.tileSize, randomName, duration);
+        const bonus = new Bonus(tile.x , tile.y, randomName, duration);
 
         this.bonuses.push(bonus)
 

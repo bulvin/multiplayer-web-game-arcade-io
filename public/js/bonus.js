@@ -11,8 +11,8 @@ export class Bonus {
 
     draw() {
         const tileSizeHalf = this.game.map.tileSize / 2;
-        const x = this.position.x - this.game.camera.x + tileSizeHalf;
-        const y = this.position.y - this.game.camera.y + tileSizeHalf + Math.sin(performance.now() / 100) * (tileSizeHalf / 2);
+        const x = this.position.x  - this.game.camera.x ;
+        const y = this.position.y - this.game.camera.y + Math.sin(performance.now() / 100) * (tileSizeHalf / 2);
     
         const strokeColor = '#ffffff';
     

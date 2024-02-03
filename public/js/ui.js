@@ -45,7 +45,6 @@ export class UI {
     updateTimer() {
     
 
-        this.ctx.save();
         this.ctx.fillStyle = this.color;
         this.ctx.shadowColor = 'black';
         this.ctx.font = `${this.fontSize + 15}px ${this.fontFamily}`;
@@ -60,12 +59,12 @@ export class UI {
         this.ctx.textAlign = 'center';
         const formattedTimerText = (this.formattedTimer !== '00:00' && parseInt(this.formattedTimer) >= 0) ? `Czas: ${this.formattedTimer}` : '';
         this.ctx.fillText(formattedTimerText, x, y);
-        this.ctx.restore();
+       
     }
 
  
    drawScoreBoard() {
-    this.ctx.save();
+   
     this.ctx.fillStyle = this.color;
     this.ctx.font = `${this.fontSize - 10}px ${this.fontFamily}`;
     this.ctx.textAlign = 'left';
@@ -74,20 +73,20 @@ export class UI {
 
     
     const scoreboardHeight = this.getScoreboardHeight(sortedPlayers);
-    this.ctx.save();
+   
 
     const borderWidth = 0.3;
     const borderColor = 'white';
 
-    this.ctx.globalAlpha = 0.8;
-    this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
+   
+    this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.3)';
     this.ctx.fillRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, scoreboardHeight + 60);
 
     this.ctx.strokeStyle = borderColor;
     this.ctx.lineWidth = borderWidth;
     this.ctx.strokeRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, scoreboardHeight + 60);
 
-    this.ctx.restore();
+   
 
     this.ctx.fillStyle = this.color;
     this.ctx.font = `${this.fontSize - 5}px ${this.fontFamily}`;
@@ -104,19 +103,19 @@ export class UI {
 
     for (let i = 0; i < sortedPlayers.length; i++) {
         const player = sortedPlayers[i];
-        const y = this.scoreboardY + headerY + (i + 1) * (this.fontSize + this.verticalSpacing);
+        const y = this.scoreboardY + headerY + (i + 0.5) * (this.fontSize + this.verticalSpacing);
 
         this.ctx.fillText(player.nickname, headerX + 50, y);
         this.ctx.fillText(player.score, headerX + 200, y);
         this.ctx.fillText(`${player.territory}%`, headerX + 350, y);
     }
 
-    this.ctx.restore();
+    
 }
 
     
     drawDeadMessage(mess, mess1) {
-        this.ctx.save();
+    
         this.ctx.fillStyle = this.color;
  
         this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
@@ -132,11 +131,11 @@ export class UI {
         this.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
         this.ctx.fillText(mess, this.canvas.width * 0.5, this.rectY + this.fontSize + lineHeight);
         this.ctx.fillText(mess1, this.canvas.width * 0.5, this.rectY + this.fontSize + 2.6 * lineHeight);
-        this.ctx.restore();
+     
     }
 
     drawStats() {
-        this.ctx.save();
+      
         this.ctx.fillStyle = this.color;
         this.ctx.shadowBlur = 15;
         this.ctx.shadowColor = 'black';
@@ -162,7 +161,7 @@ export class UI {
       
         this.ctx.fillText(`Pozycja w leaderboardzie: ${this.getLeaderboardPosition(this.player)}`, x, y);
     
-        this.ctx.restore();
+       
     }
 
 
