@@ -4,7 +4,10 @@ export class PlayerController {
         this.player = player;
     }
     handleInput(input) {
-        this.player.setInput(input);
+        
+       this.player.setInput(input);
+      
+        
     }
     sendUpdate(game) {
          const socket = this.userController.socket;

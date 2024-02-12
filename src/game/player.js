@@ -5,9 +5,9 @@ export class Player {
     this.psize = 32;
     this.x = 0;
     this.y = 0;
-    this.speed = 0.20;
+    this.speed = 0.2;
     this.color = color;
-    this.tileColor = '#ff0000';
+    this.tileColor = "#ff0000";
     this.lands = [];
     this.tail = [];
     this.input = [];
@@ -25,17 +25,16 @@ export class Player {
     this.slowMultiplier = 1;
     this.moveQueue = [];
     this.moving = false;
-  
-
   }
 
   update(deltaTime) {
 
     if (this.dead) {
+
       if (this.deadTimer > this.deadInterval) {
         this.dead = false;
         this.deadTimer = 0;
-        this.input = [];
+        this.moveQueue = [];
         this.initBase();
       } else {
         this.deadTimer += deltaTime;
@@ -43,15 +42,15 @@ export class Player {
     } else {
 
       this.checkTakeEffects();
+
       if (this.activeAbility) {
         this.activeAbility.duration -= deltaTime;
 
         if (this.activeAbility.duration <= 0) {
-         
           this.resetAbilityEffects();
-         
         }
       }
+
       if (this.activeBonus) {
         this.activeBonus.duration -= deltaTime;
 
@@ -60,49 +59,46 @@ export class Player {
         }
       }
 
-         const oldLand = this.game.map.getTile(Math.floor(this.y), Math.floor(this.x));
+      if (!this.moving && this.moveQueue.length > 0) {
+        const newDir = this.moveQueue.shift();
+        this.setDirection(newDir);
+      }
+      this.move(deltaTime);
 
-          if (!this.moving && this.moveQueue.length > 0) {
-            const newDir = this.moveQueue.shift();
-            this.setDirection(newDir);
-          
-          }
-        
-          this.move(deltaTime);
-            
-           if (this.isHitInBorders() || this.isHitSelf()) {
-            this.dead = true;
-            this.deaths++;
-            this.clear();
-            return;
-          }
-        
-          const land = this.game.map.getTile(Math.floor(this.y), Math.floor(this.x));
-     
-          if (oldLand !== land) {
-            if (oldLand.playerId !== this.user.id && !this.dead) {
-              this.addLandToTail(oldLand);
-            }
-          
-    
-            if (this.user.id === land.playerId && !land.hasTail && this.tail.length > 0) {
-              this.tail.push(land);
-    
-              this.takeArea();
-    
-              this.gainPoints();
-              this.tail = [];
-            }
-            const ability = this.useAbility();
-            if (ability) {
-              this.previousDirection = this.direction; 
-  
-              this.activeAbility = ability;
-              
-            }
-           
-          }
-         
+      if (this.isHitInBorders() || this.isHitSelf()) {
+        this.dead = true;
+        this.deaths++;
+        this.clear();
+        return;
+      }
+
+      if (!this.moving) {
+        const land = this.game.map.getTile(this.y, this.x);
+        if (land.playerId !== this.user.id) {
+
+          this.addLandToTail(land);
+
+        }
+
+        if (
+          this.user.id === land.playerId &&
+          !land.hasTail &&
+          this.tail.length > 0
+        ) {
+          this.tail.push(land);
+
+          this.takeArea();
+
+          this.gainPoints();
+          this.tail = [];
+        }
+        const ability = this.useAbility();
+        if (ability) {
+          this.previousDirection = this.direction;
+
+          this.activeAbility = ability;
+        }
+      }
     }
   }
 
@@ -112,175 +108,181 @@ export class Player {
       this.targetX = this.x + this.direction.dx;
       this.targetY = this.y + this.direction.dy;
     }
-    const dt = (deltaTime / 1000) * 60
+    const dt = (deltaTime / 1000) * 60;
     const moveAmount = this.speed * this.slowMultiplier * dt;
-  
-   
+
     const dx = this.targetX - this.x;
     const dy = this.targetY - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-  
+
     if (distance > 0) {
       const normalizedX = dx / distance;
       const normalizedY = dy / distance;
-  
+
       this.x += normalizedX * moveAmount;
       this.y += normalizedY * moveAmount;
-    } 
-  
+    }
+
     if (Math.abs(dx) <= moveAmount && Math.abs(dy) <= moveAmount) {
       this.x = this.targetX;
       this.y = this.targetY;
       this.moving = false;
     }
   }
-  
-  
 
   setDirection(newDir) {
     const currentDirection = this.direction;
     const newDirection = keyToDirection[newDir];
-  
-    if (!(currentDirection.dx === -newDirection.dx && currentDirection.dy === -newDirection.dy)) {
+
+    if (
+      currentDirection.dx + newDirection.dx !== 0 ||
+      currentDirection.dy + newDirection.dy !== 0
+    ) {
       this.direction = newDirection;
     }
-  
+  }
+
+  setInput(input) {
+    const key = input.pop();
+
+    if (!this.dead) {
+      if ([Keys.W, Keys.S, Keys.A, Keys.D].includes(key) && !this.moveQueue.includes(key)) {
+
+        this.moveQueue.push(key);
+        this.input = input;
+
+      }
+    }
+
 
   }
-  queueDirection(direction) {
-    
-     
-      this.moveQueue.push(direction);
-    
-  }
-  setInput(input) {
-    const inputKeys = ["w", "s", "a", "d", "e", "r", "t"];
-    const validatedInput = input.filter((key) => inputKeys.includes(key));
-  
-    if (validatedInput.length > 0 && !this.dead) {
-      this.moveQueue = [];
-      validatedInput.forEach((key) => {
-        if (["w", "s", "a", "d"].includes(key)) {
-        
-            this.queueDirection(key);
-          
-        }
-      });
-  
-      this.input = validatedInput;
-  
-    } else {
-      this.input = [];
-    }
-  }
   addLandToTail(land) {
-    land.hasTail = true;
-    land.color = this.tileColor;
-    land.playerId = this.user.id;
+    this.game.map.setTile(
+      land.x,
+      land.y,
+      {
+        playerId: land.playerId,
+        color: this.tileColor,
+      },
+      true);
     return this.tail.push(land);
   }
   takeArea() {
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
     const start = this.tail[0];
     const end = this.tail[this.tail.length - 1];
 
-    let wholeBase = [...this.tail, ...this.lands];
 
-    for (const segment of wholeBase) {
-      if (segment.x < minX) minX = segment.x;
-      if (segment.x > maxX) maxX = segment.x;
-      if (segment.y < minY) minY = segment.y;
-      if (segment.y > maxY) maxY = segment.y;
-    }
-
-    wholeBase = [];
-    const baseTiles = [];
-
-    for (let y = minY; y <= maxY; y++) {
-      for (let x = minX; x <= maxX; x++) {
-        let tile = this.game.map.getTile(y, x);
-        if (tile.playerId === this.user.id && !tile.hasTail) {
-          baseTiles.push({ x, y });
-        }
-      }
-    } 
-    this.tail = this.tail.concat(this.getTailComplement(start.x, start.y, end.x, end.y, baseTiles));
+    this.tail = this.tail.concat(
+      this.getTailComplement(start.x, start.y, end.x, end.y, this.lands)
+    );
 
     this.fillZone();
-
     this.updateTailAndLands();
   }
 
   fillZone() {
-    const xs = this.tail.map(segment => segment.x);
-    const ys = this.tail.map(segment => segment.y);
+    const xs = this.tail.map((segment) => segment.x);
+    const ys = this.tail.map((segment) => segment.y);
     const minX = Math.min(...xs);
     const maxX = Math.max(...xs);
     const minY = Math.min(...ys);
     const maxY = Math.max(...ys);
-  
+
+    const lostTiles = new Map();
+
+    const addToLostTiles = (playerId, tile) => {
+      if (!lostTiles.has(playerId)) {
+        lostTiles.set(playerId, []);
+      }
+      lostTiles.get(playerId).push(tile);
+    };
+
+    this.tail = this.tail.filter(tile => {
+      if (tile.playerId !== this.user.id) {
+        tile.color = this.color;
+
+        if (tile.playerId !== 0) {
+          addToLostTiles(tile.playerId, tile);
+        }
+        return true;
+      }
+      return false;
+    });
+
     const width = maxX - minX + 2;
     const height = maxY - minY + 2;
-  
-    let helpTiles = new Map();
+
+    const helpTiles = new Map();
+   
     for (let i = 0; i < width + 1; i++) {
       for (let j = 0; j < height + 1; j++) {
         helpTiles.set(`${i},${j}`, 0);
       }
     }
-  
+
     let tile;
     for (let i = 1; i < width; i++) {
       for (let j = 1; j < height; j++) {
         tile = this.game.map.getTile(minY + j - 1, minX + i - 1);
-        helpTiles.set(`${i},${j}`, tile.playerId);
+        helpTiles.set(`${i},${j}`, tile.color);
       }
     }
-  
+
     this.startFilling(helpTiles, 0, 0);
-  
+
     for (let i = 1; i < width; i++) {
       for (let j = 1; j < height; j++) {
-        tile = this.game.map.getTile(minY + j - 1, minX + i - 1);
-        if (tile.playerId === this.user.id && tile.hasTail) {
+        let tile = this.game.map.getTile(minY + j - 1, minX + i - 1);
+
+        if (tile.color === this.color) {
           helpTiles.set(`${i},${j}`, -1);
+        } else if (tile.playerId !== this.user.id && tile.playerId !== 0) {
+            addToLostTiles(tile.playerId, tile);
         }
       }
     }
-  
+
     for (let [key, value] of helpTiles) {
+
       if (value !== -1) {
-        const [i, j] = key.split(',').map(Number);
+
+        const [i, j] = key.split(",").map(Number);
         tile = this.game.map.getTile(minY + j - 1, minX + i - 1);
+
         this.tail.push(tile);
       }
     }
+
+    for (let [playerId, tiles] of lostTiles) {
+    
+      const player = this.game.getPlayer(playerId);
+      player.removeTilesFromTerritory(tiles);
+    }
+
   }
-  
+
   startFilling(tiles, x, y) {
-  let stack = [x, y];
-  while (stack.length > 0) {
-    let y = stack.pop();
-    let x = stack.pop();
-    let key = `${x},${y}`;
-    if (!tiles.has(key)) {
-      continue;
-    }
-    let tile = tiles.get(key);
-    if (tile === this.user.id || tile === -1) {
-      continue;
-    }
-
-    tiles.set(key, -1);
-
-    for (const directionKey in Direction) {
-      const direction = Direction[directionKey];
-      stack.push(x + direction.dx, y + direction.dy);
+    const stack = [{x, y}];
+    while (stack.length > 0) {
+      const {x, y} = stack.pop();
+      let position = `${x},${y}`;
+      if (!tiles.has(position)) {
+        continue;
+      }
+      let tile = tiles.get(position);
+      if (tile === this.color || tile === -1) {
+        continue;
+      }
+  
+      tiles.set(position, -1);
+  
+      for (const direction of Object.values(Direction)) {
+        stack.push({x: x + direction.dx, y: y + direction.dy});
+      }
     }
   }
-}
-     
+
   getTailComplement(startX, startY, endX, endY, tiles) {
     const points = this.findShortestPath(startX, startY, endX, endY, tiles);
 
@@ -296,31 +298,24 @@ export class Player {
   findShortestPath(startX, startY, endX, endY, tiles) {
     const queue = [{ x: startX, y: startY, distance: 0, path: [] }];
     const visited = new Set();
-
+    const tilesMap = new Map(tiles.map(tile => [`${tile.x},${tile.y}`, tile]));
+  
     while (queue.length > 0) {
-
       const { x, y, distance, path } = queue.shift();
-
-
+  
       if (x === endX && y === endY) {
         return path;
       }
-
+  
       if (visited.has(`${x},${y}`)) {
         continue;
       }
-
+  
       visited.add(`${x},${y}`);
-
-      const neighbors = [
-        { x: x + 1, y, direction: "Right" },
-        { x: x - 1, y, direction: "Left" },
-        { x, y: y + 1, direction: "Down" },
-        { x, y: y - 1, direction: "Up" },
-      ];
-
-      for (const neighbor of neighbors) {
-        if (tiles.some(tile => tile.x === neighbor.x && tile.y === neighbor.y)) {
+  
+      for (const direction of Object.values(Direction)) {
+        const neighbor = { x: x + direction.dx, y: y + direction.dy };
+        if (tilesMap.has(`${neighbor.x},${neighbor.y}`)) {
           queue.push({
             x: neighbor.x,
             y: neighbor.y,
@@ -330,31 +325,47 @@ export class Player {
         }
       }
     }
-
-    return null; 
-  }
-
- 
-  updateTailAndLands() {
-    this.tail.forEach(segment => {
-      segment.playerId = this.user.id;
-      segment.color = this.color;
-      segment.hasTail = false;
-    });
-    this.lands.push(...this.tail);
-    this.tail = [];
-
-  }
   
+    return null;
+  }
+  updateTailAndLands() {
+
+
+    this.tail.forEach((tile) => {
+      this.game.map.setTile(
+        tile.x,
+        tile.y,
+        { playerId: this.user.id, color: this.color },
+        false);
+    });
+
+    const scoreToAdd = this.gainPoints();
+    this.score += scoreToAdd;
+
+    this.lands.push(...this.tail);
+
+    this.tail = [];
+  }
+
+
   gainPoints() {
     let totalScore = 0;
-    this.lands.forEach((land) => {
+    this.tail.forEach((land) => {
       totalScore += land.score * this.multiplyScore;
     });
-    this.score += totalScore;
+    return totalScore;
+  }
+  removeTilesFromTerritory(tiles) {
+    this.lands = this.lands.filter(land => {
+      if (tiles.includes(land)) {
+        this.score -= land.score;
+        return false;
+      }
+      return true;
+    })
   }
 
-  getOwnPercentageOfMap() {
+  getTerritoryPercentage() {
     const squaresAll = this.game.map.countTiles();
     const percent = (this.lands.length / squaresAll) * 100;
 
@@ -395,28 +406,39 @@ export class Player {
   }
   clear() {
 
-    this.lands.forEach((square) => {
-      square.playerId = 0;
-      square.hasTail = false;
-      square.color = "#111";
+    this.lands.forEach((land) => {
+      this.game.map.setTile(
+        land.x,
+        land.y,
+        { playerId: 0, color: '#111' },
+        false
+      );
+
+    });
+    this.tail.forEach((tile) => {
+      this.game.map.setTile(
+        tile.x,
+        tile.y,
+        { playerId: 0, color: '#111', oldPlayerId: this.user.id, oldColor: this.color },
+        false
+      );
+
     });
 
-
-    this.tail.forEach((square) => {
-      square.hasTail = false;
-      square.color = "#111";
-      square.playerId = 0;
-    });
-   
     this.lands = [];
     this.tail = [];
     this.score = 0;
     this.direction = Direction.None;
-    this.speed = 0.20;
+    this.speed = 0.2;
     this.moving = false;
     this.moveQueue = [];
-   
+    if (this.activeBonus) {
+      this.resetBonusEffect();
+    }
+
+
   }
+
   spawn() {
     const spawnBorder = Math.floor(Math.random() * 4);
     let spawnRow, spawnCol;
@@ -448,7 +470,6 @@ export class Player {
     const spawnTile = this.game.map.getTile(spawnRow, spawnCol);
     this.x = spawnTile.x;
     this.y = spawnTile.y;
-
   }
   checkTakeEffects() {
     const abilities = this.game.abilities;
@@ -457,7 +478,6 @@ export class Player {
     abilities.forEach((ability, index) => {
       const abilityPosition = ability.position;
 
-    
       if (this.x === abilityPosition.x && this.y === abilityPosition.y) {
         this.applyAbilityEffect(ability);
         abilities.splice(index, 1);
@@ -512,17 +532,14 @@ export class Player {
           this.activeAbility !== "Powrót"
         ) {
           if (this.lands.length > 0) {
-            
             const randomIndex = Math.floor(Math.random() * this.lands.length);
             const randomLand = this.lands[randomIndex];
             this.x = randomLand.x;
             this.y = randomLand.y;
-            this.targetX = randomLand.x; 
-            this.targetY = randomLand.y; 
+            this.targetX = randomLand.x;
+            this.targetY = randomLand.y;
             this.tail.forEach((tile) => {
-              tile.hasTail = false;
-              tile.color = "#111";
-              tile.playerId = 0;
+              this.game.map.setTile(tile.x, tile.y, 0, '#111', false);
             });
             this.tail = [];
           }
@@ -539,12 +556,10 @@ export class Player {
       this.speed *= 0.5;
     } else if (this.activeAbility.name === "Spowolnienie") {
       for (const id in this.game.players) {
-        
-          const otherPlayer = this.game.players[id];
-          otherPlayer.slowMultiplier = 1;
-        
+        const otherPlayer = this.game.players[id];
+        otherPlayer.slowMultiplier = 1;
       }
-    } else if (this.activeAbility.name === "Powrót") { 
+    } else if (this.activeAbility.name === "Powrót") {
       this.direction = this.previousDirection;
     }
 
@@ -578,7 +593,6 @@ export class Player {
     this.activeBonus = null;
   }
   initBase() {
-
     this.spawn();
 
     for (let row = -1; row < 2; row++) {
@@ -596,6 +610,7 @@ export class Player {
           spawnLand.playerId = this.user.id;
           spawnLand.color = this.color;
           this.lands.push(spawnLand);
+          this.game.map.updatedTiles.push(spawnLand);
         }
       }
     }
@@ -610,26 +625,22 @@ export class Player {
   }
 
   toJSON() {
-    const territory = this.getOwnPercentageOfMap();
+    const territory = this.getTerritoryPercentage();
     return {
       nickname: this.user.name,
       color: this.color,
       x: this.x,
       y: this.y,
-      psize: this.psize,
       score: this.score,
-      dead: this.dead,
       kills: this.kills,
       deaths: this.deaths,
       territory: territory,
       abilities: this.abilitiesBinds,
       bonus: this.activeBonus,
       activeAbility: this.activeAbility,
-      slowMultiplier: this.slowMultiplier,
-      tileColor: this.tileColor,
+      dead: this.dead
     };
   }
-
 
 }
 
@@ -647,8 +658,8 @@ const Direction = {
   Up: { dx: 0, dy: -1 },
   Down: { dx: 0, dy: 1 },
   Right: { dx: 1, dy: 0 },
-  Left: { dx: -1, dy: 0},
-  None: { dx: 0, dy: 0}
+  Left: { dx: -1, dy: 0 },
+  None: { dx: 0, dy: 0 },
 };
 
 const keyToDirection = {

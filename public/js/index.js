@@ -7,16 +7,12 @@ import { startGame } from "./networking.js";
 const nickname = document.getElementById("nickname");
 const sendNickBtn = document.getElementById("send-nickname");
 const roomList = document.getElementById("roomList");
-const roomsTable = document.querySelector("#rooms-table");
 const canvas = document.getElementById("game-map");
-const titleRooms = document.getElementById("rooms-title");
-const content = document.getElementById("#centered-content");
 const rooms = document.getElementById("rooms");
 const start = document.querySelector(".start-btn");
 
 const createRoomBtn = document.getElementById("create-room");
 
-canvas.style.display = "none";
 document.getElementById("rooms").style.display = "none";
 
 export function generateRooms(rooms) {
@@ -98,7 +94,7 @@ sendNickBtn.addEventListener("click", (e) => {
           },
           (error) => {
             if (error) {
-              console.log(error);
+             
               alert(error);
              
               return;

@@ -1,4 +1,3 @@
-import {Player} from "./player.js";
 import {Ability} from "./ability.js";
 import {Bonus} from "./bonus.js";
 import { ColorSystem } from "./color.js";
@@ -129,9 +128,19 @@ export class Game {
        }
     }
     getLeaderboard() {
-       return Object.values(this.players).sort((a, b) => {
-            return b.score - a.score;
-        });
+        const leaderboard = [];
+        for (const id in this.players) {
+            const player = this.players[id];
+            const score = player.score;
+            const territoryPercentage = player.getTerritoryPercentage();
+            leaderboard.push({
+                name: player.user.name,
+                score: score,
+                territoryPercentage: territoryPercentage,
+            });
+        }
+        leaderboard.sort((a, b) => b.score - a.score);
+        return leaderboard;
     }
     getLeaderboardPosition(search) {
         const leaderboard = this.getLeaderboard();
@@ -145,20 +154,40 @@ export class Game {
 
         return [messageDead, messageTime];
     }
-    toJSON() {
-       
-        let backendPlayers = {};
+    toJSON(playerId) {
+
+        if (!this.players[playerId]) {
+            return;
+         }
+
+        const me = this.players[playerId].toJSON();
+    
+        const backendPlayers = {};
+      
         for (const id in this.players) {
-            backendPlayers[id] = this.players[id].toJSON();
+            if (id !== playerId && !this.players[id].dead) {
+
+                backendPlayers[id] = {
+                    nickname: this.players[id].user.name,
+                    color: this.players[id].color,
+                    x: this.players[id].x,
+                    y: this.players[id].y,
+                };
+            }  
         }
+        const map = this.map.toJSON();
+        const leaderBoard = this.getLeaderboard();
+        
         return {
             id: this.id,
-            map: this.map,
+            map: map,
             gameTimer: this.gameTimer,
             abilities: this.abilities,
             bonuses: this.bonuses,
             gameOver: this.gameOver,
+            me: me,
             players: backendPlayers,
+            leaderBoard: leaderBoard,
         };
     }
 

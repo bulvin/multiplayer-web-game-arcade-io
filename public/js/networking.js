@@ -45,7 +45,7 @@ socket.on("disconnected", (info) => {
 });
 let canvasDisplayed = false;
 socket.on("updateGame", (backendGame, timestamp) => {
-  
+ 
   if (!canvasDisplayed) {
     document.querySelector("#lobby").style.display = 'none';
     document.querySelector("#game-map").style.display = 'block';
@@ -64,21 +64,20 @@ socket.on("updateGame", (backendGame, timestamp) => {
       gameTimer: backendGame.gameTimer,
       abilities: backendGame.abilities,
       bonuses: backendGame.bonuses,
+      me: backendGame.me,
       players: backendGame.players,
+      leaderBoard: backendGame.leaderBoard,
     };
     const newGameView = gameManager.createGame(backendGame.id, gameData);
-    const localPlayer = newGameView.getPlayer(socket.id);
-    if (localPlayer) {
-      newGameView.camera.setTargetPlayer(localPlayer);
-    }
   }
 });
+
 
 socket.on("deadMessage", (data) => {
   for (const i in gameManager.games) {
     const game = gameManager.games[i];
 
-    game.players[socket.id].ui.setMessages(data.messages);
+    game.ui.setMessages(data.messages); 
   }
 });
 
@@ -93,7 +92,6 @@ socket.on("currentPlayers", (data) => {
 
 socket.on("message", ({ playerName, text, createdAt }) => {
   const date = new Date(createdAt);
-  
   
   const hours = date.getHours();
   const minutes = date.getMinutes();

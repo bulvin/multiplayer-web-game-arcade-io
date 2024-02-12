@@ -3,18 +3,37 @@ export class GameController {
         this.game = game;
         this.roomController = roomController;
         this.playersControllers = playersControllers;
-        this.loop = setInterval(this.sendGameUpdate.bind(this), 15);
+        this.tickRate = 1000 / 60; 
+        this.loop = null;
+        this.startLoop();
     }
-    sendGameUpdate() {
-        if (this.game.gameOver) { clearInterval(this.loop); return; }
 
+    startLoop() {
+        this.loop = setTimeout(this.gameLoop.bind(this), this.tickRate);
+    }
+
+    gameLoop() {
+        if (!this.game.gameOver) {
+            this.sendGameUpdate();
+            this.startLoop();
+        }
+    }
+
+    sendGameUpdate() {
+      
         this.game.update();
-        const gameData = this.game.toJSON();    
         this.playersControllers.forEach(playerController => {
+          
+            const gameData = this.game.toJSON(playerController.player.user.id);
             playerController.sendUpdate(gameData);
         });
+        this.game.map.updatedTiles = [];
     }
 
-
-
+    stopLoop() {
+        if (this.loop) {
+            clearTimeout(this.loop);
+            this.loop = null;
+        }
+    }
 }

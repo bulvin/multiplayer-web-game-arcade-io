@@ -1,26 +1,22 @@
 export class UI {
-    constructor(player) {
-        this.player = player;
-        this.game = player.game;
-        this.canvas = player.game.canvas;
-        this.ctx = player.game.context;
+    constructor(game) {
+        this.game = game;
         this.fontSize = 28;
         this.fontFamily = 'Bangers';
         this.color = 'white';
         this.messages = [];
         this.scoreboardX = 20;
         this.scoreboardY = 20;
-        this.scoreboardWidth = 425;
-        this.verticalSpacing = 10;
-        this.titleSpacing = 20;
+        this.scoreboardWidth = this.game.canvas.width * 0.2;
+        this.verticalSpacing = 1;
+        this.titleSpacing = 0;
         this.formattedTimer = '';
         this.rectY = 0;
 
     }
 
     draw() {
-       
-        this.ctx.save();
+
 
         if (this.game.gameOver) {
             this.gameOver();
@@ -33,220 +29,198 @@ export class UI {
               
             if (this.messages.length > 0) {
                 this.drawDeadMessage(this.messages[0], this.messages[1]);
-                if (!this.player.dead) {
+                if(!this.game.me.dead) {
                     this.messages = [];
                 }
+              
+                
             }
         }
        
-        this.ctx.restore();
     }
 
     updateTimer() {
+        this.game.ctx.fillStyle = this.color;
+      
+        this.game.ctx.font = `${this.fontSize + 15}px ${this.fontFamily}`;
     
-
-        this.ctx.fillStyle = this.color;
-        this.ctx.shadowColor = 'black';
-        this.ctx.font = `${this.fontSize + 15}px ${this.fontFamily}`;
-
         const minutes = Math.floor(this.game.gameTimer / (60 * 1000));
         const seconds = Math.floor((this.game.gameTimer % (60 * 1000)) / 1000);
-
+    
         this.formattedTimer = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-        const x = this.canvas.width / 2;
+    
+        const x = this.game.canvas.width * 0.5;
         const y = this.game.map.tileSize * 3;
-        this.ctx.textAlign = 'center';
         const formattedTimerText = (this.formattedTimer !== '00:00' && parseInt(this.formattedTimer) >= 0) ? `Czas: ${this.formattedTimer}` : '';
-        this.ctx.fillText(formattedTimerText, x, y);
-       
+        this.drawText(formattedTimerText, x, y, 'center');
     }
-
- 
-   drawScoreBoard() {
-   
-    this.ctx.fillStyle = this.color;
-    this.ctx.font = `${this.fontSize - 10}px ${this.fontFamily}`;
-    this.ctx.textAlign = 'left';
-
-    const sortedPlayers = Object.values(this.game.players).sort((a, b) => b.score - a.score).slice(0, 5);
-
     
-    const scoreboardHeight = this.getScoreboardHeight(sortedPlayers);
-   
-
-    const borderWidth = 0.3;
-    const borderColor = 'white';
-
-   
-    this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.3)';
-    this.ctx.fillRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, scoreboardHeight + 60);
-
-    this.ctx.strokeStyle = borderColor;
-    this.ctx.lineWidth = borderWidth;
-    this.ctx.strokeRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, scoreboardHeight + 60);
-
-   
-
-    this.ctx.fillStyle = this.color;
-    this.ctx.font = `${this.fontSize - 5}px ${this.fontFamily}`;
-    this.ctx.textAlign = 'center';
-    this.ctx.fillText('Tabela Wyników', this.scoreboardX + this.scoreboardWidth / 2, this.scoreboardY + this.fontSize + this.titleSpacing);
-
-    const headerX = this.scoreboardX + 20;
-    this.ctx.font = `${this.fontSize - 5}px ${this.fontFamily}`;
-    const headerY = this.scoreboardY + this.fontSize + 2 * this.titleSpacing;
-
-    this.ctx.fillText('Gracz', headerX + 50, headerY + 10);
-    this.ctx.fillText('Punkty', headerX + 200, headerY + 10);
-    this.ctx.fillText('Teren', headerX + 350, headerY + 10);
-
-    for (let i = 0; i < sortedPlayers.length; i++) {
-        const player = sortedPlayers[i];
-        const y = this.scoreboardY + headerY + (i + 0.5) * (this.fontSize + this.verticalSpacing);
-
-        this.ctx.fillText(player.nickname, headerX + 50, y);
-        this.ctx.fillText(player.score, headerX + 200, y);
-        this.ctx.fillText(`${player.territory}%`, headerX + 350, y);
+    drawScoreBoard() {
+        const sortedPlayers = this.game.leaderBoard;
+    
+        const playerHeight = this.fontSize + this.verticalSpacing - 5;
+        const scoreboardHeight = 2 * this.titleSpacing + playerHeight * sortedPlayers.length;
+        const borderWidth = 0.3;
+        const borderColor = 'white';
+    
+        this.setFillAndStroke('hsla(180, 0%, 10%, 0.5)', borderColor, borderWidth); 
+        this.drawRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, scoreboardHeight + 60);
+    
+        this.setFillAndFont(this.color, `${this.fontSize - 10}px ${this.fontFamily}`);
+    
+        const headerX = this.scoreboardX + this.scoreboardWidth * 0.05; 
+        const headerY = this.scoreboardY + this.fontSize + 2 * this.titleSpacing;
+    
+        this.drawHeaders(headerX, headerY, sortedPlayers);
     }
-
     
-}
-
+    drawHeaders(headerX, headerY, sortedPlayers) {
+        const positionX = headerX;
+        const nameX = headerX + this.scoreboardWidth * 0.2;
+        const scoreX = headerX + this.scoreboardWidth * 0.45; 
+        const territoryX = headerX + this.scoreboardWidth * 0.7; 
+    
+        this.drawText('#', positionX, headerY + 10, 'left');
+        this.drawText('Gracz', nameX, headerY + 10, 'left');
+        this.drawText('Punkty', scoreX, headerY + 10, 'left');
+        this.drawText('Teren', territoryX, headerY + 10, 'left');
+    
+        for (let i = 0; i < sortedPlayers.length; i++) {
+            const player = sortedPlayers[i];
+            const y = this.scoreboardY + headerY + (i + 0.5) * (this.fontSize + this.verticalSpacing);
+    
+            this.drawText(i + 1, positionX, y, 'left'); 
+            this.drawText(player.name, nameX, y, 'left');
+            this.drawText(player.score, scoreX, y, 'left');
+            this.drawText(`${player.territoryPercentage}%`, territoryX, y, 'left');
+        }
+    }
     
     drawDeadMessage(mess, mess1) {
-    
-        this.ctx.fillStyle = this.color;
- 
-        this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-        this.ctx.textAlign = 'center';
         const lineHeight = this.fontSize + 15;
         const textHeight = lineHeight * 4;
-        this.rectY = (this.canvas.height - textHeight) * 0.5;
-        this.ctx.save();
-        this.ctx.globalAlpha = 0.5;
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(0, this.rectY, this.canvas.width, textHeight);
-        this.ctx.restore();
-        this.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
-        this.ctx.fillText(mess, this.canvas.width * 0.5, this.rectY + this.fontSize + lineHeight);
-        this.ctx.fillText(mess1, this.canvas.width * 0.5, this.rectY + this.fontSize + 2.6 * lineHeight);
-     
-    }
-
-    drawStats() {
-      
-        this.ctx.fillStyle = this.color;
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = 'black';
-        this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-    
-        const lineHeight = this.fontSize + 10;
-        const x = this.canvas.width * 0.01;
-        let y = this.canvas.height - lineHeight;
-        
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText(`Liczba zabójstw: ${this.player.kills}`, x, y);
-        y -= lineHeight;
-    
-        this.ctx.fillText(`Liczba śmierci: ${this.player.deaths}`, x, y);
-        y -= lineHeight;
-    
-        this.ctx.fillText(`Punkty: ${this.player.score}`, x, y);
-        y -= lineHeight;
-    
-        this.ctx.fillText(`Zajęty teren: ${this.player.territory}%`, x, y);
-        y -= lineHeight;
-    
-      
-        this.ctx.fillText(`Pozycja w leaderboardzie: ${this.getLeaderboardPosition(this.player)}`, x, y);
-    
+        this.rectY = this.game.canvas.height * 0.5 - textHeight * 0.5;
+ 
+        this.setFillAndFont(this.color, `${this.fontSize - 5}px ${this.fontFamily}`);
        
+        this.setFill('black');
+        this.drawRect(0, this.rectY, this.game.canvas.width, textHeight);
+    
+        this.setFillAndFont(this.color, `${this.fontSize + 10}px ${this.fontFamily}`);
+        this.drawText(mess, this.game.canvas.width * 0.5, this.rectY + this.fontSize + lineHeight, 'center');
+        this.drawText(mess1, this.game.canvas.width * 0.5, this.rectY + this.fontSize + 2.6 * lineHeight, 'center');
+    
     }
-
-
-    drawAbilitiesUI(){
-        this.ctx.save();
-
-        let x = this.canvas.width * 0.8;
-        let y = this.canvas.height - 80;
+    
+    drawStats() {
+        const lineHeight = this.fontSize + 10;
+        const x = this.game.canvas.width * 0.01;
+        let y = this.game.canvas.height - lineHeight;
+    
+        this.setFillAndFont(this.color, `${this.fontSize}px ${this.fontFamily}`);
+  
+        this.drawText(`Liczba zabójstw: ${this.game.me.kills}`, x, y, 'left');
+        y -= lineHeight;
+        this.drawText(`Liczba śmierci: ${this.game.me.deaths}`, x, y, 'left');
+        y -= lineHeight;
+        this.drawText(`Punkty: ${this.game.me.score}`, x, y, 'left');
+        y -= lineHeight;
+        this.drawText(`Zajęty teren: ${this.game.me.territory}%`, x, y, 'left');
+        y -= lineHeight;
+        this.drawText(`Pozycja w leaderboardzie: ${this.getLeaderboardPosition(this.player)}`, x, y, 'left');
+    }
+    
+    drawAbilitiesUI() {
+        let x = this.game.canvas.width * 0.8;
+        let y = this.game.canvas.height * 0.9;
         const borderWidth = 0.3;
         const borderColor = 'white';
         const countAbilities = 3;
-        this.ctx.strokeStyle = borderColor;
-        this.ctx.lineWidth = borderWidth;
-        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
-        this.ctx.font = `${this.fontSize - 10}px ${this.fontFamily}`;
-        this.ctx.save();
-       
-         
+    
+        this.setFillAndStroke('hsla(180, 0%, 10%, 0.5)', borderColor, borderWidth);
+        this.setFillAndFont(this.color, `${this.fontSize - 10}px ${this.fontFamily}`);
+    
         for (let i = 0; i < countAbilities; i++) {
-            this.ctx.fillRect(x + i * this.game.map.tileSize * 2, y , this.game.map.tileSize * 2, this.game.map.tileSize * 2);
-            this.ctx.strokeRect(x + i * this.game.map.tileSize * 2 , y, this.game.map.tileSize * 2, this.game.map.tileSize * 2);
+            this.drawRect(x + i * this.game.map.tileSize * 2, y, this.game.map.tileSize * 2, this.game.map.tileSize * 2);
         }
- 
-        this.ctx.restore();
+    
         let textX = x + this.game.map.tileSize;
         const textY = y + this.game.map.tileSize;
-      
-        let index = 1;
-        this.ctx.fillStyle = this.color;
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Umiejętności', textX + this.game.map.tileSize * 2, textY - 30); 
-        for (const key of Object.keys(this.player.abilities)) {
-            const ability = this.player.abilities[key];
-            if (ability) {
-                this.ctx.fillText(ability.name, textX, textY);
-            }
-          
-          
-            this.font = `${this.fontSize - 15}px ${this.fontFamily}`;
-            this.ctx.fillText(key, textX, textY - 15);
-            if (this.player.activeAbility) {
-                this.ctx.fillText(`${Math.ceil(this.player.activeAbility.duration * 0.001) }s.`, textX, textY + 25);
-            }
-            textX = textX + this.game.map.tileSize + index * this.game.map.tileSize; 
-            index++;
-            
-        }
-        textX = x + this.game.map.tileSize * 8;
-        this.ctx.fillText('Bonus', textX , textY - 30); 
-        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
-        this.ctx.fillRect(x + this.game.map.tileSize * 7, y, this.game.map.tileSize * 2, this.game.map.tileSize * 2)
-        this.ctx.strokeRect(x + this.game.map.tileSize * 7, y, this.game.map.tileSize * 2, this.game.map.tileSize * 2)
-        this.ctx.fillStyle = this.color;
-        if (this.player.bonus) {
-            this.ctx.fillText(this.player.bonus.name, x + this.game.map.tileSize * 8, y + this.game.map.tileSize);
-            this.ctx.fontSize = 10;
-            this.ctx.fillText(`${Math.ceil(this.player.bonus.duration * 0.001) }s.`, x + this.game.map.tileSize * 8, y + this.game.map.tileSize * 1.8);
-        }
-     
-   
-        this.ctx.restore();
+    
+        this.drawText('Umiejętności', textX + this.game.map.tileSize * 2, textY - 30, 'center');
+        this.drawAbilities(textX, textY);
     }
-
+    
+    drawAbilities(textX, textY) {
+        let index = 1;
+        if (this.game.me.abilities) {
+            for (const key of Object.keys(this.game.me.abilities)) {
+                const ability = this.game.me.abilities[key];
+                const abilityX = textX + (index - 1) * this.game.map.tileSize * 2;
+                const abilityY = textY - this.game.map.tileSize * 0.5;
+    
+                this.setFillAndFont(this.color, `${this.fontSize - 10}px ${this.fontFamily}`);
+                this.drawText(ability.name, abilityX, abilityY, 'center');
+    
+                if (ability.duration > 0) {
+                    this.setFillAndFont('red', `${this.fontSize - 10}px ${this.fontFamily}`);
+                    this.drawText(Math.ceil(ability.duration * 0.001), abilityX, abilityY + this.game.map.tileSize * 0.5, 'center');
+                }
+    
+                index++;
+            }
+        }
+    }
+    
+    setFillAndStroke(fill, stroke, lineWidth) {
+        this.game.ctx.fillStyle = fill;
+        this.game.ctx.strokeStyle = stroke;
+        this.game.ctx.lineWidth = lineWidth;
+    }
+    
+    setFillAndFont(fill, font) {
+        this.game.ctx.fillStyle = fill;
+        this.game.ctx.font = font;
+    }
+    
+    setFill(fill) {
+        this.game.ctx.fillStyle = fill;
+    }
+    
+    setFont(font) {
+        this.game.ctx.font = font;
+    }
+    
+    drawRect(x, y, width, height) {
+        this.game.ctx.fillRect(x, y, width, height);
+        this.game.ctx.strokeRect(x, y, width, height);
+    }
+    drawText(text, x, y, align) {
+        this.game.ctx.textAlign = align;
+        this.game.ctx.fillText(text, x, y);
+    }
     gameOver() {
-        this.ctx.save();
-        this.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
-        this.ctx.fillStyle = this.color;
+        this.game.ctx.save();
+        this.game.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
+        this.game.ctx.fillStyle = this.color;
         const lineHeight = this.fontSize + 20;
-        this.ctx.save();
-        this.ctx.globalAlpha = 0.8;
-        this.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.restore();
-        this.ctx.textAlign = 'center';
+        this.game.ctx.save();
+        this.game.ctx.globalAlpha = 0.8;
+        this.game.ctx.fillStyle = 'hsla(180, 0%, 10%, 0.5)';
+        this.game.ctx.fillRect(0, 0, this.game.canvas.width, this.game.canvas.height);
+        this.game.ctx.restore();
+        this.game.ctx.textAlign = 'center';
         let message = 'Gra Skończona - Tabela Wyników';
-        this.ctx.fillText(message, this.canvas.width * 0.5, this.canvas.height * 0.3 - lineHeight);
+        this.game.ctx.fillText(message, this.game.canvas.width * 0.5, this.game.canvas.height * 0.3 - lineHeight);
 
         const leaderBoard = Object.values(this.game.players).sort((a, b) => b.score - a.score);
         for (let i = 0; i < leaderBoard.length; i++) {
             const player = leaderBoard[i];
             let playerStats = `${i + 1}. ${player.nickname} - Kills: ${player.kills}, Deaths: ${player.deaths}, Score: ${player.score}, Territory: ${player.territory}%`;
-            this.ctx.fillText(playerStats, this.canvas.width * 0.5, this.canvas.height * 0.3 + (i + 1) * lineHeight);
+            this.game.ctx.fillText(playerStats, this.game.canvas.width * 0.5, this.game.canvas.height * 0.3 + (i + 1) * lineHeight);
         }
 
-        this.ctx.restore();
+        this.game.ctx.restore();
     }
 
     getScoreboardHeight(sortedPlayers) {

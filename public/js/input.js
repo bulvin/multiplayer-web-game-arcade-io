@@ -1,22 +1,22 @@
 import { sendPlayerInput } from "./networking.js";
 
 export class InputHandler {
-    constructor(player) {
-        this.player = player;
+    constructor() {
+        this.input = [];
 
         window.addEventListener('keydown', (e) => {
             e.preventDefault();
           
-            if (['w', 's', 'a', 'd', 'r', 't', 'e'].includes(e.key) && !this.player.input.includes(e.key)) {
-                this.player.input.push(e.key);
-                sendPlayerInput(this.player.input);
+            if (['w', 's', 'a', 'd', 'r', 't', 'e'].includes(e.key) && !this.input.includes(e.key)) {
+                this.input.push(e.key);
+                sendPlayerInput(this.input);
             }
         });
 
         window.addEventListener('keyup', (e) => {
-            if (this.player.input.includes(e.key)) {
-                this.player.input.splice(this.player.input.indexOf(e.key), 1);
-                sendPlayerInput(this.player.input);
+            if (this.input.includes(e.key)) {
+                this.input.splice(this.input.indexOf(e.key), 1);
+                sendPlayerInput(this.input);
             }
         });
         

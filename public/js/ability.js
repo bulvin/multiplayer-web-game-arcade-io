@@ -16,13 +16,13 @@ export class Ability {
         const circleColor = "white";
         const radius = this.game.map.tileSize / 2;
     
-        this.game.context.save();
-        this.game.context.fillStyle = circleColor;
-        this.game.context.shadowColor = circleColor;
-        this.game.context.shadowBlur = 15;
-        this.game.context.beginPath();
-        this.game.context.arc(x, y, radius, 0, 2 * Math.PI);
-        this.game.context.fill();
-        this.game.context.restore();
+        this.game.ctx.save();
+        this.game.ctx.fillStyle = circleColor;
+        this.game.ctx.shadowColor = circleColor;
+        this.game.ctx.shadowBlur = 15;
+        this.game.ctx.beginPath();
+        this.game.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        this.game.ctx.fill();
+        this.game.ctx.restore();
     }
 }

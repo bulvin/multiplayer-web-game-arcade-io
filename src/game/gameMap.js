@@ -5,19 +5,27 @@ export class GameMap {
         this.width = cols * this.tileSize;
         this.height = rows * this.tileSize;
         this.tileSize = 32;
-        this.tiles = []; 
+        this.tiles = [];
+
         this.initTiles();
-     
+        this.updatedTiles = [];
+
     }
     getTile(row, col) {
         return this.tiles[row][col];
-      }
-    setTile(x, y, playerId, color, isTail) {
+    }
+    setTile(x, y, player, hasTail) {
+
         const tile = this.getTile(y, x);
-        tile.playerId = playerId;
-        tile.color = color;
-        tile.hasTail = isTail;
-      }
+        tile.playerId = player.playerId;
+        tile.color = player.color;
+        tile.hasTail = hasTail;
+ 
+
+        this.updatedTiles.push(tile);
+        
+
+    }
     initTiles() {
 
         let pointsScale = 3;
@@ -38,29 +46,24 @@ export class GameMap {
                 }
 
                 tile = new Tile(col, row, 0, points, 32, '#111', false);
-                  
+
                 this.tiles[row].push(tile);
 
 
             }
 
-       
+
         }
     }
 
+
     countTiles() {
-        let count = 0;
-        
-        for (let row = 0; row < this.tiles.length; row++) {
-          count += this.tiles[row].length;
-        }
-        
-        return count;
+        return this.rows * this.cols;
     }
 
     toJSON() {
-        const { ...gameMapData } = this;
-        return gameMapData;
+        const tiles = this.updatedTiles.map(tile => tile.toJSON());
+        return tiles;
     }
 
 }
@@ -74,6 +77,16 @@ class Tile {
         this.size = size;
         this.color = color;
         this.hasTail = hasTail;
+
+    }
+
+    toJSON() {
+        return {
+            x: this.x,
+            y: this.y,
+            color: this.color,
+
+        }
     }
 }
 

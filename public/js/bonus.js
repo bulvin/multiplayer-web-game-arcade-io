@@ -16,17 +16,17 @@ export class Bonus {
     
         const strokeColor = '#ffffff';
     
-        this.game.context.save();
-        this.game.context.lineWidth = 10;
-        this.game.context.strokeStyle = strokeColor;
-        this.game.context.beginPath();
-        this.game.context.arc(x, y, tileSizeHalf, 0, 2 * Math.PI , false);
-        this.game.context.stroke();
+        this.game.ctx.save();
+        this.game.ctx.lineWidth = 10;
+        this.game.ctx.strokeStyle = strokeColor;
+        this.game.ctx.beginPath();
+        this.game.ctx.arc(x, y, tileSizeHalf, 0, 2 * Math.PI , false);
+        this.game.ctx.stroke();
     
-        this.game.context.font = '16px Bangers';
-        this.game.context.fillStyle = 'white';
-        this.game.context.textAlign = 'center';
-        this.game.context.fillText(this.name, x, y + 5);
-        this.game.context.restore();
+        this.game.ctx.font = '16px Bangers';
+        this.game.ctx.fillStyle = 'white';
+        this.game.ctx.textAlign = 'center';
+        this.game.ctx.fillText(this.name, x, y + 5);
+        this.game.ctx.restore();
     }
 }
