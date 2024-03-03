@@ -7,4 +7,11 @@ export class Bonus {
         this.name = name;
         this.duration = duration;
     }
+    toJSON() {
+        return {
+            x: this.position.x,
+            y: this.position.y,
+            name: this.name,
+        }
+    }
 }

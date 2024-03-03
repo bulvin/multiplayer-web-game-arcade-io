@@ -1,4 +1,3 @@
-import { lerp } from "./animate.js";
 export class Player {
 
     constructor({ nickname, color, x, y}, game) {
@@ -21,25 +20,36 @@ export class Player {
         this.game.ctx.save();
       
         this.game.ctx.shadowColor = this.color;
-        this.game.ctx.shadowBlur = 15;
+        this.game.ctx.shadowBlur = 20;
         this.game.ctx.fillStyle = this.color;
         this.game.ctx.strokeStyle = "white";
         this.game.ctx.lineWidth = 4;
-        this.game.ctx.fillRect(tileX, tileY, this.game.map.tileSize * window.devicePixelRatio, this.game.map.tileSize * window.devicePixelRatio);
-        this.game.ctx.strokeRect(tileX, tileY, this.game.map.tileSize * window.devicePixelRatio, this.game.map.tileSize * window.devicePixelRatio);
+        this.game.ctx.fillRect(tileX, tileY, this.game.map.tileSize, this.game.map.tileSize);
+        this.game.ctx.strokeRect(tileX, tileY, this.game.map.tileSize, this.game.map.tileSize);
 
     
         this.game.ctx.restore();
 
     }
-    move() {
-        this.x = lerp(this.x, this.target.x, 0.5);
-        this.y = lerp(this.y, this.target.y, 0.5);
+    update(backendPlayer) {
+        this.updatePosition(backendPlayer.x, backendPlayer.y);
+        this.score = backendPlayer.score;
+        this.kills = backendPlayer.kills;
+        this.deaths = backendPlayer.deaths;
+        this.territory = backendPlayer.territory;
+        this.abilities = backendPlayer.abilities;
+        this.activeBonus = backendPlayer.activeBonus;
+        this.activeAbility = backendPlayer.activeAbility;
+        this.game.map.tileSize = backendPlayer.tileSize;
+        this.dead = backendPlayer.dead;
     }
     updatePosition(newX, newY) {
         this.target.x = newX;
         this.target.y = newY;
 
-       
+    }
+    move() {
+        this.x = this.game.lerp(this.x, this.target.x, 0.5);
+        this.y = this.game.lerp(this.y, this.target.y, 0.5);
     }
 }

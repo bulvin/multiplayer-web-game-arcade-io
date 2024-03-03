@@ -12,8 +12,20 @@ export class Ability {
     draw() {
         const x = this.position.x - this.game.camera.x + this.game.map.tileSize / 2;
         const y = this.position.y  - this.game.camera.y + this.game.map.tileSize / 2 + Math.sin(performance.now() / 1000) * (this.game.map.tileSize / 4);
+        let circleColor;
+        
+        if (this.name === "PRĘDKOŚĆ") {
+            circleColor = "#1E90FF"; 
+        } else if (this.name === "SPOWOLNIENIE") {
+            circleColor = "#FF4500"; 
+        } else if (this.name === "ODPORNOŚĆ") {
+            circleColor = "#32CD32"; 
+        } else if (this.name === "WIDOCZNOŚĆ") {
+            circleColor = "#FFFF00"; 
+        } else if (this.name === "TELEPORT") {
+            circleColor = "#800080"; 
+        }
     
-        const circleColor = "white";
         const radius = this.game.map.tileSize / 2;
     
         this.game.ctx.save();

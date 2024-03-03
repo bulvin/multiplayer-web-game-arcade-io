@@ -3,37 +3,66 @@ export class GameController {
         this.game = game;
         this.roomController = roomController;
         this.playersControllers = playersControllers;
-        this.tickRate = 1000 / 60; 
+        this.tickRate = 15; 
         this.loop = null;
-        this.startLoop();
+        this.executeTick();
     }
 
-    startLoop() {
-        this.loop = setTimeout(this.gameLoop.bind(this), this.tickRate);
+    executeTick() {
+        this.loop = setTimeout(this.nextTick.bind(this), this.tickRate);
     }
 
-    gameLoop() {
+    nextTick() {
         if (!this.game.gameOver) {
             this.sendGameUpdate();
-            this.startLoop();
+            this.executeTick();
+        } else {
+            const scoreboard = this.game.getEndLeaderboard();
+            this.playersControllers.forEach(playerController => {
+                const socket = playerController.userController.socket;
+                socket.emit('gameOver', scoreboard);
+            });
+            this.cancelTick();
+            setTimeout(() => {
+                this.roomController.backToLobby(this.game.id);
+            
+            }, 11 * 1000);
         }
     }
 
     sendGameUpdate() {
       
         this.game.update();
+
         this.playersControllers.forEach(playerController => {
-          
-            const gameData = this.game.toJSON(playerController.player.user.id);
-            playerController.sendUpdate(gameData);
+            playerController.sendUpdate(this.game);
+
         });
+
         this.game.map.updatedTiles = [];
     }
 
-    stopLoop() {
+    cancelTick() {
         if (this.loop) {
             clearTimeout(this.loop);
             this.loop = null;
         }
+    }
+
+    addPlayer(playerController) {
+        playerController.player.initBase();
+    
+        this.game.map.tiles.forEach((row) => {
+            row.forEach((tile) => {
+                this.game.map.updatedTiles.push(tile);
+            });
+        });
+    
+        this.playersControllers.push(playerController);
+        this.game.addPlayer(playerController.player);
+    }
+    removePlayer(playerController) {
+        this.playersControllers = this.playersControllers.filter(pc => pc !== playerController);
+        this.game.deletePlayer(playerController.player.user.id);
     }
 }

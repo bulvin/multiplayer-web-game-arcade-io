@@ -1,4 +1,5 @@
 import { formatMessage } from "../utils/formatMessage.js";
+import { isValidToStartGame} from "../utils/valid.js";
 
 export  class UserController {
     constructor(socket, user) {
@@ -9,10 +10,10 @@ export  class UserController {
         this.socket.join(room);
         this.user.room = room
         if (room !== "rooms") {
-            this.socket.emit("message", formatMessage("Admin", "Witaj graczu!"));
+            this.socket.emit("message", formatMessage("SERWER", "Witaj graczu!", "info"));
             this.socket.to(room).emit(
                 "message",
-                formatMessage("Admin", `${this.user.name} dołączył do gry`)
+                formatMessage("SERWER", `${this.user.name} dołączył do gry`, "info")
               );
         }
        
@@ -21,19 +22,30 @@ export  class UserController {
     leaveCurrRoom() {
        this.socket.leave(this.user.room);
        if (this.user.room !== "rooms") {
-           this.socket.to(this.user.room).emit("message", formatMessage('Admin', `Gracz ${this.user.name} opuścił grę.`));
+           this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} opuścił grę.`, "info"));
        }
     
 
     }
     sendMessage(message) {
-     
+        if (message.trim() === "" || !message) return;
+
         this.socket.emit("message", formatMessage(this.user.name, message));
         this.socket.to(this.user.room).emit("message", formatMessage(this.user.name, message));
     }
+
+    updateGameForm(gameData, room) {
+        
+        const GameDataFormValidation = isValidToStartGame(gameData, room);
+        if (GameDataFormValidation.error) {
+            return;
+        } 
+        this.socket.to(this.user.room).emit("updateGameForm", gameData);
+    
+    }
    
     disconnect() {
-        this.socket.to(this.user.room).emit("message", formatMessage('Admin', `Gracz ${this.user.name} rozłączył się.`));
+        this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} rozłączył się.`, "info"));
     
     }
   

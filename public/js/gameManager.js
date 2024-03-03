@@ -1,29 +1,26 @@
 import { Game } from "./game.js";
 
 
-class GameManager {
-    constructor() {
-        this.games = {};
-    }
+let game = null;
 
-    createGame(id, gameData){
-        
-        const newGame = new Game(gameData);
-        for (const id in gameData.players){
+export function createGame(gameData) {
+    if (!game) {
+        game = new Game(gameData);
+        for (const id in gameData.players) {
             const backendPlayer = gameData.players[id];
-            newGame.addPLayer(backendPlayer, id);
-        
+            game.addPLayer(backendPlayer, id);
         }
-        this.games[id] = newGame;
-        return newGame;
     }
-    getGame(id){
-        return this.games[id];
-    }
-    deleteGame(id){
-        delete this.games[id];
+    return game;
+}
+
+export function getGame() {
+    return game;
+}
+
+export function deleteGame() {
+    if(game) {
+        game.stopAnimate();
+        game = null;
     }
 }
-const gameManager = new GameManager();
-
-export { gameManager };

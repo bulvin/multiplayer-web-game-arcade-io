@@ -1,65 +1,45 @@
-import { gameManager } from "./gameManager.js";
-import { generateRooms } from "./index.js";
-import { updatePlayersinRoom } from "./index.js";
+import {  getGame } from "./gameManager.js";
+import { displayElement, generateRooms, showError, updatePlayersInRoom } from "./index.js";
+import { elements } from "./index.js";
+import { createGame, deleteGame} from "./gameManager.js";
+import io from 'socket.io-client';
 
-const socket = io.connect(`${window.location.host}`, { transports: ["websocket"] });
+const socket = io(`${window.location.host}`, { transports: ["websocket"] });
 
-export function enterNickname(nickname) {
-  socket.emit("join", nickname);
-}
+const enterNickname = (nickname) => socket.emit("join", nickname);
 
-export function sendPlayerInput(input) {
-  const clientTime = Date.now();
-  socket.emit("playerInput", { keys: input, timestamp: clientTime });
-}
+const sendPlayerInput = (input) => socket.emit("playerInput", input);
 
-export function createRoom(data, callback) {
-  const { name, maxPlayers } = data;
+const createRoom = (name, maxPlayers) =>  socket.emit("createRoom", { name: name, maxPlayers: maxPlayers,});
 
-  socket.emit("createRoom", {
-    name: name,
-    maxPlayers: maxPlayers,
-  });
+const joinRoom = (room) => socket.emit("joinRoom", room);
 
-  socket.on("errorCreateRoom", (errorMessage) => {
-    callback(errorMessage);
-  });
-}
+const sendMessage = (message) => socket.emit('receiveMessage', message);
 
-export function joinRoom(room) {
- 
-  socket.emit("joinRoom", room);
-}
+const startGame = (gameMode, gameTime) => socket.emit('startGame', { gameMode, gameTime });
 
-socket.on("errorJoin", (errorMessage) => {
-  
-  alert(errorMessage);
+const updateGameForm = (gameMode, gameTime) => socket.emit('gameFormUpdate', { gameMode, gameTime });
+
+
+
+
+socket.on("joinedOrCreated", () => {
+  displayElement(elements.lobby, "flex");
+  displayElement(elements.rooms, "none");
 });
 
-socket.on("playerJoined", (player) => {
-  console.log("Gracz dołączył do gry: ", player);
-});
+socket.on("error", (errorMessage) => showError(errorMessage));
 
-socket.on("disconnected", (info) => {
-  console.log(info);
-});
-let canvasDisplayed = false;
-socket.on("updateGame", (backendGame, timestamp) => {
- 
-  if (!canvasDisplayed) {
-    document.querySelector("#lobby").style.display = 'none';
-    document.querySelector("#game-map").style.display = 'block';
-    canvasDisplayed = true; 
+
+socket.on("updateGame", (backendGame) => {
+  const frontendGame = getGame();
+
+  if (frontendGame) {
+    frontendGame.update(backendGame);
   }
-
-  if (gameManager.games[backendGame.id]) {
-    const frontendGame = gameManager.games[backendGame.id];
-   
-    frontendGame.update(backendGame, timestamp);
-    
-  } else {
+  else {
     const gameData = {
-      id: backendGame.id,
+      mode: backendGame.mode,
       map: backendGame.map,
       gameTimer: backendGame.gameTimer,
       abilities: backendGame.abilities,
@@ -68,44 +48,56 @@ socket.on("updateGame", (backendGame, timestamp) => {
       players: backendGame.players,
       leaderBoard: backendGame.leaderBoard,
     };
-    const newGameView = gameManager.createGame(backendGame.id, gameData);
+    
+    const newGameView = createGame(gameData);
+
+    displayElement(elements.lobby, "none")
+    displayElement(elements.canvas, "block");
   }
 });
+
 
 
 socket.on("deadMessage", (data) => {
-  for (const i in gameManager.games) {
-    const game = gameManager.games[i];
-
-    game.ui.setMessages(data.messages); 
-  }
+  const frontendGame = getGame();
+  frontendGame.ui.setMessages(data.messages);
+  
 });
 
 socket.on("updateRooms", (rooms) => {
+
+  displayElement(elements.rooms, "grid");
+  displayElement(elements.nicknameSection, "none");
   generateRooms(rooms);
 });
 
-socket.on("currentPlayers", (data) => {
-  
-  updatePlayersinRoom(data);
-});
+socket.on("currentPlayers", (data) => updatePlayersInRoom(data));
 
-socket.on("message", ({ playerName, text, createdAt }) => {
+
+socket.on("message", ({ playerName, text, type, createdAt }) => {
   const date = new Date(createdAt);
-  
+
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  
-  const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 
-  const chatMessages = document.querySelector(".chat-messages");
-  const html = `<div class="message">
+  const time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+  const chatMessages = elements.chatMessages;
+  let messageClass;
+  if (type === 'error') {
+    messageClass = 'message-error';
+  } else if (type === 'info') {
+    messageClass = 'message-info';
+  } else {
+    messageClass = 'message-normal';
+  }
+  const html = `<div class="message ${messageClass}">
     <p>
       <span class='message-playername'>
         ${playerName}
       </span>
       <span class='message-date'>
-        ${formattedTime}
+        ${time}
       </span>
     </p>
     <p>
@@ -113,17 +105,40 @@ socket.on("message", ({ playerName, text, createdAt }) => {
     </p>
   </div>`;
   chatMessages.insertAdjacentHTML('afterBegin', html);
+});
+
+
+
+socket.on("updateGameForm", (gameData) => {
+
+  const { gameMode, gameTime } = gameData;
+  elements.gameModeSelect.value = gameMode;
+  elements.gameTimerInput.value = gameTime;
 
 });
 
-export const sendMessage = (message) => {
 
- socket.emit('receiveMessage', message);
-   
+socket.on("gameOver", (scoreboard) => {
+  const frontendGame = getGame();
+  frontendGame.gameOver = true;
+  frontendGame.ui.setEndGameScreen(scoreboard);
+
+})
+
+socket.on("backToLobby", () => {
+  displayElement(elements.lobby, "flex");
+  displayElement(elements.canvas, "none");
+  deleteGame();
+});
+
+
+ const leaveRoom = () => {
+  socket.emit('leaveRoom');
+
+  if (!getGame()) {
+    displayElement(elements.rooms, "grid");
+  }
 }
-     
-export const startGame = () => {
-  socket.emit('startGame');
-}
 
 
+export { enterNickname, sendPlayerInput, createRoom, joinRoom, sendMessage, startGame, updateGameForm, leaveRoom };

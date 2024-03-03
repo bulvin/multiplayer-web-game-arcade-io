@@ -7,23 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IO Game</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
+
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
 
 </head>
 
 <body>
   <div id="centered-content">
     <form id="nickname-section">
-      <input type="text" id="nickname" placeholder="Wprowadź swój pseudonim">
+      <input type="text" id="nickname" placeholder="Wprowadź swój pseudonim"  autocomplete="off" autofocus="on">
       <button id="send-nickname" type="submit">Ok</button>
+
     </form>
 
-    <div id="rooms">
+    <div id="rooms" style="display: none;">
       <p id="title-rooms">Lista pokoi gry</p>
       <table id="rooms-table">
         <thead id="rooms-header">
@@ -40,36 +39,38 @@
 
     <main id="lobby" style="display: none;">
       <section class="section-game-info">
-        <h2 class="subheading">
-          Informacje o grze
-        </h2>
-        <h3 id="room-info">Pokój: </h3>
-        <h3>Gracze:</h3>
-        <ul id="players-list">
-
-        </ul>
+        <div class="game-info-container">
+          <h2 class="subheading">
+            Informacje o grze
+          </h2>
+          <h3 id="room-info">Pokój: </h3>
+          <h3>Gracze:</h3>
+          <ul id="players-list"> </ul>
+        </div>
+        <button id="leave-room-button">Opuść pokój</button>
       </section>
 
       <section class="section-game">
         <h2 class="subheading">Wybór trybu gry</h2>
-
-        <form>
+      
+        <form class="game-form">
           <select id="type-game" class="type-game-select">
-            <option value="Standard">Standard</option>
-            <option value="Drużynowy">Drużynowy</option>
-           
-        </select>
+            <option value="standard">Standard</option>
+            <option value="team">Drużynowy</option>
+          </select>
+          <label for="game-timer" class="game-timer-label">Czas gry:</label>
+          <input id="game-timer" type="number" min="2" max="10" value="2" class="game-timer-input">
         </form>
         <button class="btn start-btn">START</button>
       </section>
 
       <section class="section-chat">
-        <h2 class="subheading">chat</h2>
+        <h2 class="subheading">Chat</h2>
         <div class="chat-messages">
 
         </div>
         <form class="chat-form">
-          <input class="form-input chat-message" name="message" placeholder="Napisz wiadomość..." autocomplete="off"
+          <input id="message" class="form-input chat-message" name="message" placeholder="Napisz wiadomość..." autocomplete="off"
             required />
           <input class="btn chat-submit-btn" type="submit" value="Wyślij" />
         </form>
@@ -82,12 +83,6 @@
   </div>
 
 
-  <script type="module" src="js/animate.js"></script>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="
-  https://cdn.jsdelivr.net/npm/throttle-debounce@5.0.0/umd/index.min.js
-  "></script>
 </body>
 
 </html>

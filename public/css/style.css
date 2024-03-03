@@ -14,16 +14,18 @@ body {
   height: 100%;
   background-color: #282c34;
   color: #fff;
-  font-family: "Bangers", cursive;
+  font-family: 'Helvetica', sans-serif;
   letter-spacing: 2px;
   overflow-y: auto;
+  background-image: url('../img/background.png');
 }
 
 #game-map {
-  background-color: #111;
+  background-color: 'white';
   width: 100%;
   height: 100%;
   touch-action: none;
+
 }
 
 #centered-content {
@@ -83,25 +85,31 @@ input::placeholder {
 }
 
 #rooms-table {
-  width: 80vw;
+  width: 100%; 
   border-collapse: collapse;
-  overflow-x: auto;
   margin: auto;
   text-align: left;
 }
+
 #rooms-header th {
-  background-image: linear-gradient(
-    to right,
-    rgb(6, 182, 212),
-    rgb(59, 130, 246)
-  );
+  background-image: linear-gradient(to right, rgb(6, 182, 212), rgb(59, 130, 246));
   color: #fff;
-  padding: 10px;
+  padding: 12px;
+
+  overflow: hidden;
 }
+
+#rooms-table td {
+  max-width: 100%; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 #rooms-table th,
 #rooms-table td {
-  padding: 10px;
+  padding: 8px;
 }
 
 #rooms-table tr:nth-child(even) {
@@ -124,18 +132,19 @@ input::placeholder {
   padding: 10px 20px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  font-family: "Bangers", cursive;
-  font-size: 32px;
+  display: inline-flex;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 26px; 
   margin: 4px 2px;
   cursor: pointer;
-  border-radius: 100px;
+  border-radius: 16px;
 }
+
+
+
 
 #lobby {
   display: flex;
-  justify-content: space-around;
-  flex-direction: row;
   width: 100vw;
   height: 100vh;
 }
@@ -150,67 +159,137 @@ input::placeholder {
   border-radius: 10px;
 }
 
-#players-list {
-    margin-left: 50px;
+
+.game-info-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
 }
+
+.section-game-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  margin: 10px;
+  padding: 20px;
+  border: 5px solid #f2f2f2;
+  border-radius: 10px;
+}
+
+#leave-room-button {
+  align-self: flex-start; 
+  border: none;
+  background-color: #f44336;
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: none;
+  background-image: linear-gradient(
+    to right,
+    rgb(244, 67, 54), 
+    rgb(145, 89, 89) 
+  );
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+#leave-room-button:hover {
+  background-image: linear-gradient(
+    to right,
+    rgb(35, 57, 129), 
+    rgb(244, 67, 54) 
+  );
+}
+
+#players-list {
+  padding: 8px 16px;
+  margin-left: 12px;
+}
+
+
 
 .subheading {
     text-align: center;
     margin-bottom: 20px;
 }
 
+.section-chat {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.chat-form {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start; 
+  align-items: flex-end; 
+}
+.form-input {
+  border: none;
+  padding: 8px;
+  border-radius: 20px;
+  background: #475569;
+  color: #cbd5e1;
+  margin-right: 12px;
+  height: 100%;
+  flex-grow: 1;
+}
+
+.chat-submit-btn {
+  border: none;
+  border-radius: 5px;
+  background-color: #61dafb;
+  padding: 10px 20px;
+  border-radius: 100px;
+  background-image: linear-gradient(to right, rgb(6, 182, 212), rgb(59, 130, 246));
+  color: white;
+  cursor: pointer;
+  font-size: 22px;
+  letter-spacing: 2px;
+}
+
   .chat {
-    flex: 2;
+    flex: 1;
   }
   
-  .chat-submit-btn {
-    flex: 1;
-    border: none;
-    border-radius: 5px;
-    background-color: #61dafb;
-    padding: 10px 20px;
-    border-radius: 100px;
-    border: none;
-    background-image: linear-gradient(
-      to right,
-      rgb(6, 182, 212),
-      rgb(59, 130, 246)
-    );
-    color: white;
-    cursor: pointer;
-    font-family: "Bangers", cursive;
-    font-size: 26px;
-    letter-spacing: 2px;
-  }
+
   .chat-submit-btn:disabled {
     background-color: gray;
   }
   
   .chat-messages {
     height: 80vh;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .message {
     margin-bottom: 10px;
   }
+
+  .message-error {
+    color: red;
+  }
   
-  .chat-form {
-    align-self: center;
-    display: flex;
-    width: 100%;
-    justify-content: space-between; 
+  .message-info {
+    color: gold;
+  }
+  
+  .message-normal {
+    color: white;
   }
 
-  .form-input {
-    border: none;
-    padding: 12px;
-    border-radius: 20px;
-    background: #475569;
-    color: #cbd5e1;
-    width: 80%; 
-    margin-right: 12px;
+  .message-playername{
+    font-weight: bold;
   }
+
+  .message-date {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  
 
   .start-btn { 
     border: none;
@@ -227,36 +306,130 @@ input::placeholder {
    
     color: white;
     cursor: pointer;
-    font-family: "Bangers", cursive;
-    font-size: 26px;
+    font-size: 22px;
     letter-spacing: 2px;
     text-align: center;
    
-      margin: 20px auto; 
-      display: block; 
+    margin: 20px auto; 
+    display: block; 
     
   }
-
+  
   .type-game-select {
-    padding: 10px; 
+    padding: 8px; 
     font-size: 16px; 
     border: 1px solid #ccc; 
-    border-radius: 5px; 
+    border-radius: 20px; 
     outline: none; 
     margin: 20px auto; 
-    font-size: 24px;
+    font-size: 20px;
     display: block; 
     width: 100%;
-    font-family: "Bangers", cursive;
+    background: #475569;
+    color: white;
+    border: none;
+
     
   }
-@media screen and (max-width: 600px) {
-  #lobby {
-    flex-direction: column;
+  .game-timer-input {
+    width: 45px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 16px;
+    background: #475569;
+    color: white;
+    border: none;
   }
-  .section-game-info,
-  .section-game,
-  .section-chat {
-    height: auto;
-  }
+
+
+  @media screen and (max-width: 600px) {
+    body {
+        font-size: 18px;
+    }
+
+    .section-game-info,
+    .section-game,
+    .section-chat {
+        height: auto;
+    }
+
+    #lobby {
+        flex-direction: column;
+    }
+
+    #leave-room-button {
+        margin-top: 10px;
+    }
+
+    #rooms-table {
+        width: 100%;
+    }
+
+    #rooms-header th,
+    #rooms-table th,
+    #rooms-table td,
+    .join-button,
+    #create-room {
+        font-size: 20px;
+    }
+
+    #rooms-table td {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 992px) {
+    body {
+        font-size: 22px;
+    }
+
+    .section-game-info,
+    .section-game,
+    .section-chat {
+        height: auto;
+    }
+
+    #rooms-table {
+        width: 100%;
+    }
+
+    .chat-form {
+        align-items: center;
+    }
+
+    #rooms-header th,
+    #rooms-table th,
+    #rooms-table td,
+    .join-button,
+    #create-room {
+        font-size: 22px;
+        padding: 8px; 
+    }
+
+    #rooms-table td {
+        max-width: 200px;
+    }
+
+    #lobby {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .section-game-info,
+    .section-game {
+        order: 1;
+    }
+
+    .section-chat {
+        order: 2;
+    }
+
+    #leave-room-button {
+        margin-top: 0;
+    }
 }
