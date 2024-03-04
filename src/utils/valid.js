@@ -31,7 +31,7 @@ function isValidRoomName(name, roomControllers) {
 
 function isValidMaxPlayers(maxPlayers) {
   const players = parseInt(maxPlayers);
-  if (isNaN(players) || players < 1 || players > 8) {
+  if (isNaN(players) || players < 2 || players > 8) {
     return { isValid: false, error: "Nieprawidłowa liczba graczy." };
   }
 
@@ -45,8 +45,8 @@ function isValidToStartGame(gameData, room) {
   if (room.game) {
     return { isValid: false, error: "Gra już została rozpoczęta." };
   }
-  if (room.users.length < 2) {
-    return { isValid: false, error: "Minimalna liczba graczy do rozpoczęcia gry to 2." };
+  if (room.users.length < 1) {
+    return { isValid: false, error: "Minimalna liczba graczy do rozpoczęcia gry to 1." };
   }
 
   if (gameMode !== "standard" && gameMode !== "team") {
