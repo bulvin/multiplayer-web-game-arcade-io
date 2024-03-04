@@ -258,7 +258,7 @@ export class UI {
                 playerStats += ` - Team: ${player.team}`;
             }
         
-            playerStats += ` - Wyeliminowałeś: ${player.kills}, Odpadłeś: ${player.deaths}, Punkty: ${player.score}, Teren: ${player.territory}%`;
+            playerStats += ` - Wyeliminował: ${player.kills}, Odpadł: ${player.deaths}, Punkty: ${player.score}, Teren: ${player.territory}%`;
             this.game.ctx.fillText(playerStats, this.game.canvas.width * 0.5, this.game.canvas.height * 0.3 + (i + 1) * lineHeight);
         }
 

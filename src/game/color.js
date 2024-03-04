@@ -1,6 +1,15 @@
 export class ColorSystem {
     constructor() {
-        this.colors = ['hsl(0, 100%, 50%)', 'hsl(45, 100%, 50%)', 'hsl(90, 100%, 50%)', 'hsl(135, 100%, 50%)', 'hsl(180, 100%, 50%)', 'hsl(225, 100%, 50%)', 'hsl(270, 100%, 50%)', 'hsl(315, 100%, 50%)'];
+        this.colors = [
+            'hsl(0, 100%, 50%)', 
+            'hsl(45, 100%, 60%)', 
+            'hsl(90, 100%, 70%)', 
+            'hsl(135, 100%, 80%)', 
+            'hsl(180, 100%, 90%)', 
+            'hsl(225, 100%, 100%)', 
+            'hsl(0, 0%, 40%)', 
+            'hsl(315, 100%, 30%)'
+        ];
         this.usedColors = [];
     }
 
@@ -12,11 +21,14 @@ export class ColorSystem {
     }
 
     _generatePlayerColor() {
-        const color = Math.floor(Math.random() * this.colors.length);
-        const colorCode = this.colors[color];
-        this.colors.splice(color, 1); 
+        if (this.colors.length === 0) {
+            this.colors = this.usedColors;
+            this.usedColors = [];
+        }
 
-        return colorCode;
+        const color = this.colors.shift();
+        this.usedColors.push(color);
+        return color;
     }
 
     _generateTailColor(color) {
