@@ -1,9 +1,12 @@
 function isValidNickname(nickname) {
+  const disallowedChars = "!@#$%^&*()[]{};:,.<>?/|`~\"'\\+=-_";
   if (!nickname || nickname.trim() === "" || nickname.length > 25) {
     return { isValid: false, error: "Nieprawidłowa nazwa gracza." };
   }
-  if (/[^a-zA-Z0-9]/.test(nickname)) {
-    return { isValid: false, error: "Nazwa gracza może zawierać tylko litery i cyfry." };
+  for (let i = 0; i < nickname.length; i++) {
+    if (disallowedChars.includes(nickname[i])) {
+      return { isValid: false, error: "Nazwa gracza zawiera niedozwolone znaki." };
+    }
   }
   return { isValid: true };
 }
@@ -28,7 +31,7 @@ function isValidRoomName(name, roomControllers) {
 
 function isValidMaxPlayers(maxPlayers) {
   const players = parseInt(maxPlayers);
-  if (isNaN(players) || players < 2 || players > 8) {
+  if (isNaN(players) || players < 1 || players > 8) {
     return { isValid: false, error: "Nieprawidłowa liczba graczy." };
   }
 
