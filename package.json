@@ -20,6 +20,7 @@
     "socket.io-client": "^4.7.4",
     "sweetalert2": "^11.6.13",
     "terser-webpack-plugin": "^5.3.10",
+    "throttle-debounce": "^5.0.0",
     "webpack": "^5.90.3"
   },
   "devDependencies": {

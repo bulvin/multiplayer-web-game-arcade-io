@@ -1,14 +1,14 @@
 export class ColorSystem {
     constructor() {
         this.colors = [
-            'hsl(0, 100%, 50%)', 
             'hsl(45, 100%, 60%)', 
             'hsl(90, 100%, 70%)', 
             'hsl(135, 100%, 80%)', 
             'hsl(180, 100%, 90%)', 
             'hsl(225, 100%, 100%)', 
             'hsl(0, 0%, 40%)', 
-            'hsl(315, 100%, 30%)'
+            'hsl(315, 100%, 30%)',
+            'hsl(0, 100%, 50%)', 
         ];
         this.usedColors = [];
     }

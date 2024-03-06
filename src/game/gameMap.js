@@ -9,6 +9,7 @@ export class GameMap {
         this.initTiles();
         this.updatedTiles = [];
         this.occupiedSpawns = [];
+        this.spawnDistance = 4;
 
     }
     getTile(row, col) {
@@ -67,7 +68,7 @@ export class GameMap {
     
     generateSpawnTile() {
         const spawnBorder = Math.floor(Math.random() * 4);
-        const borderBuffer = 2; 
+        const borderBuffer = 1; 
         let spawnRow, spawnCol;
     
         if (spawnBorder === 0) {
@@ -93,19 +94,18 @@ export class GameMap {
     }
     
     getRandomRow(borderBuffer) {
-        return Math.floor(Math.random() * (this.rows - 2 * borderBuffer)) + borderBuffer;
+        return Math.floor(Math.random() * (this.rows - 4 * borderBuffer)) + borderBuffer;
     }
     
     getRandomCol(borderBuffer) {
-        return Math.floor(Math.random() * (this.cols - 2 * borderBuffer)) + borderBuffer;
+        return Math.floor(Math.random() * (this.cols - 4 * borderBuffer)) + borderBuffer;
     }
     
     isOccupied(tile) {
-        for (let occupied of this.occupiedSpawns) {
-            if (occupied && occupied.x === tile.x && occupied.y === tile.y) {
-                return true;
-            }
-        }
+       if (this.occupiedSpawns.some(lastTile => this.distanceBetweenTiles(tile, lastTile) < this.spawnDistance)) {
+              return true;
+       }
+
         for (let row = -1; row < 2; row++) {
             for (let col = -1; col < 2; col++) {
                 const newRow = tile.y + row;
@@ -126,6 +126,10 @@ export class GameMap {
         }
     
         return false;
+    }
+
+    distanceBetweenTiles(tile1, tile2) {
+        return Math.sqrt(Math.pow(tile1.row - tile2.row, 2) + Math.pow(tile1.col - tile2.col, 2));
     }
     
     releaseSpawn(playerId) {

@@ -137,12 +137,12 @@ export class Player {
 
   setInput(input) {
     const key = input.pop();
-
+   
     if (!this.dead) {
       if ([Keys.W, Keys.S, Keys.A, Keys.D].includes(key) && !this.moveQueue.includes(key)) {
 
         this.moveQueue.push(key);
-
+       
       } else if (key === Keys.E || key === Keys.R || key === Keys.T) {
         this.useAbility(key);
       }
@@ -494,6 +494,8 @@ export class Player {
       name: this.activeAbility ? this.activeAbility.name : '',
       duration: this.activeAbility ? this.activeAbility.duration : ''
     }
+
+    
     return {
       nickname: this.user.name,
       color: this.color,

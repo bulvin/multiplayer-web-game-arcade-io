@@ -13,7 +13,7 @@ export class Game {
         this.ctx = this.canvas.getContext('2d');
         this.devicePixelRatio = window.devicePixelRatio || 1;
         this.ctx.scale(this.devicePixelRatio || 1, this.devicePixelRatio || 1);
-        this.canvas.width = window.innerWidth 
+        this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight;
 
         this.mode = mode;
@@ -37,26 +37,26 @@ export class Game {
 
         window.addEventListener("resize", this.resizeCanvas.bind(this));
         this.canvas.addEventListener("wheel", (event) => event.preventDefault());
-        
-        
+
+
         this.animate();
 
 
     }
     update(gameData) {
-      
+
         for (const playerID in this.players) {
             if (!gameData.players[playerID]) {
                 delete this.players[playerID];
             }
         }
         const backendPlayer = gameData.me;
-     
-            this.gameTimer = gameData.gameTimer;
-            this.map.update(gameData.map);
-            this.me.update(backendPlayer);
-        
-        
+
+        this.gameTimer = gameData.gameTimer;
+        this.map.update(gameData.map);
+        this.me.update(backendPlayer);
+
+
         for (const playerId in gameData.players) {
             const backendPlayer = gameData.players[playerId];
 
@@ -94,7 +94,7 @@ export class Game {
             const player = this.players[id]
             player.draw();
         }
-      
+
         for (const i in this.abilities) {
             const ability = this.abilities[i];
             ability.draw();
@@ -111,7 +111,7 @@ export class Game {
         this.animationId = requestAnimationFrame(this.animate.bind(this));
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (!this.me.dead){
+        if (!this.me.dead) {
             this.me.move();
         }
         for (const id in this.players) {
@@ -125,8 +125,8 @@ export class Game {
         this.inputHandler.stopCapturingInput();
         cancelAnimationFrame(this.animationId);
     }
-    lerp(start, end, lerpFactor) {
-        return start + (end - start) * lerpFactor;
+    lerp(start, end, t) {
+        return start + (end - start) * t;
     }
 
     addPLayer(player, id) {

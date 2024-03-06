@@ -10,8 +10,9 @@ export class Player {
             x: x,
             y: y,
         };
+        
         this.game = game;    
-      
+        this.timeStartedLerping = performance.now();
     }
     draw() {
         const tileX = this.x * this.game.map.tileSize - this.game.camera.x;
@@ -31,8 +32,10 @@ export class Player {
         this.game.ctx.restore();
 
     }
+ 
     update(backendPlayer) {
-        this.updatePosition(backendPlayer.x, backendPlayer.y);
+
+       this.updatePosition(backendPlayer.x, backendPlayer.y);
         this.score = backendPlayer.score;
         this.kills = backendPlayer.kills;
         this.deaths = backendPlayer.deaths;
@@ -43,13 +46,15 @@ export class Player {
         this.game.map.tileSize = backendPlayer.tileSize;
         this.dead = backendPlayer.dead;
     }
-    updatePosition(newX, newY) {
-        this.target.x = newX;
-        this.target.y = newY;
-
+    updatePosition(targetX, targetY) {
+        this.target.x = targetX;
+        this.target.y = targetY;
     }
+
     move() {
         this.x = this.game.lerp(this.x, this.target.x, 0.5);
         this.y = this.game.lerp(this.y, this.target.y, 0.5);
+    
+    
     }
 }

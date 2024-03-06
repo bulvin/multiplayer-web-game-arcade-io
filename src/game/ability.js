@@ -59,7 +59,14 @@ class SlowAbility extends Ability {
     }
 
     use(player) {
-        const otherPlayers = Object.values(player.game.players).filter((p) => p.user.id !== player.user.id);
+        let otherPlayers;
+        if (player.team) {
+            otherPlayers = Object.values(player.game.players).filter((p) => p.user.id !== player.user.id && p.team !== player.team);
+        } else {
+            
+            otherPlayers = Object.values(player.game.players).filter((p) => p.user.id !== player.user.id);
+        }
+        
         for (const other of otherPlayers) {
             other.slowMultiplier = 0.5;
         }

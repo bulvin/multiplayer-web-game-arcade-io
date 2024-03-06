@@ -2,13 +2,15 @@ import {  getGame } from "./gameManager.js";
 import { displayElement, generateRooms, showError, updatePlayersInRoom } from "./index.js";
 import { elements } from "./index.js";
 import { createGame, deleteGame} from "./gameManager.js";
+
 import io from 'socket.io-client';
+import { throttle } from "throttle-debounce";
 
 const socket = io(`${window.location.host}`, { transports: ["websocket"] });
 
 const enterNickname = (nickname) => socket.emit("join", nickname);
 
-const sendPlayerInput = (input) => socket.emit("playerInput", input);
+const sendPlayerInput = (input) => throttle(socket.emit("playerInput", input), 20);
 
 const createRoom = (name, maxPlayers) =>  socket.emit("createRoom", { name: name, maxPlayers: maxPlayers,});
 
@@ -50,10 +52,12 @@ socket.on("updateGame", (backendGame) => {
     };
     
     const newGameView = createGame(gameData);
-
+ 
     displayElement(elements.lobby, "none")
     displayElement(elements.canvas, "block");
   }
+ 
+
 });
 
 
