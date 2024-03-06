@@ -9,7 +9,7 @@ export class GameMap {
         this.initTiles();
         this.updatedTiles = [];
         this.occupiedSpawns = [];
-        this.spawnDistance = 4;
+        this.spawnDistance = 5;
 
     }
     getTile(row, col) {
@@ -102,7 +102,7 @@ export class GameMap {
     }
     
     isOccupied(tile) {
-       if (this.occupiedSpawns.some(lastTile => this.distanceBetweenTiles(tile, lastTile) < this.spawnDistance)) {
+       if (this.occupiedSpawns.some(lastTile => this.distanceBetweenTiles(tile, lastTile) <= this.spawnDistance)) {
               return true;
        }
 

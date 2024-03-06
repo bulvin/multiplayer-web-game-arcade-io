@@ -255,7 +255,7 @@ export class UI {
             const player = this.leaderBoard[i];
             let playerStats = `${i + 1}. ${player.name}`;
             if (this.game.mode === 'team') {
-                playerStats += ` - Team: ${player.team}`;
+                playerStats += ` - Drużyna: ${player.team}`;
             }
         
             playerStats += ` - Wyeliminował: ${player.kills}, Odpadł: ${player.deaths}, Punkty: ${player.score}, Teren: ${player.territory}%`;

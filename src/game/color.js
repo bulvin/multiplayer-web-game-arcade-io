@@ -1,13 +1,13 @@
 export class ColorSystem {
     constructor() {
         this.colors = [
-            'hsl(45, 100%, 60%)', 
+            'hsl(0, 0%, 40%)', 
             'hsl(90, 100%, 70%)', 
             'hsl(135, 100%, 80%)', 
             'hsl(180, 100%, 90%)', 
             'hsl(225, 100%, 100%)', 
-            'hsl(0, 0%, 40%)', 
             'hsl(315, 100%, 30%)',
+            'hsl(45, 100%, 60%)', 
             'hsl(0, 100%, 50%)', 
         ];
         this.usedColors = [];
@@ -33,7 +33,7 @@ export class ColorSystem {
 
     _generateTailColor(color) {
         const [hue, saturation, lightness] = color.match(/\d+/g);
-        const darkerColor = `hsl(${hue}, ${saturation}%, ${Math.min(Number(lightness) - 40, 100)}%)`;
+        const darkerColor = `hsl(${hue}, ${saturation}%, ${Math.min(Number(lightness) - 50, 100)}%)`;
         return darkerColor;
     }
 }

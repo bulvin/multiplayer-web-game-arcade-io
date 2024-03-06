@@ -46,7 +46,8 @@ export class Game {
                 const player = this.players[id];
 
                 player.update(deltaTime);
-               
+
+              
                 if (player.getCountTiles() === this.map.countTiles())  this.gameOver = true;
 
             }

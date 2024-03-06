@@ -38,7 +38,7 @@ export class Player {
       minY: this.y - Math.floor(SPAWN_SIZE * 0.5),
       maxY: this.y + Math.floor(SPAWN_SIZE * 0.5)
     }
-
+  
   }
 
   update(deltaTime) {
@@ -67,7 +67,7 @@ export class Player {
     }
     this.move(deltaTime);
 
-    if (this.isHitInBorders()) {
+    if (this.isHitInBorders() || this.lands.length === 0) {
       this.die();
       return;
     }
@@ -75,16 +75,24 @@ export class Player {
     if (this.hasArrived) {
       const land = this.game.map.getTile(this.y, this.x);
       this.updateAreaPositions();
+      
       if (this.isHitSelf(land)) {
         this.die();
-        return;
+
       } else if (this.isHitOther(land)) {
         const otherPlayer = Object.values(this.game.players).find(player => player.user.id === land.tailOwner);
         if (otherPlayer) {
           this.kill(otherPlayer, land);
         }
       } else if (land.color !== this.color && !land.hasTail) {
-        this.addLandToTail(land);
+        const otherPlayer = Object.values(this.game.players).find(player => player.user.id === land.playerId);
+        if (otherPlayer && otherPlayer.x === land.x && otherPlayer.y === land.y) {
+          this.die();
+
+        } else {
+          this.addLandToTail(land);
+        }
+
       } else if (this.color === land.color && this.tail.length > 0) {
         this.takeArea();
 
@@ -137,12 +145,12 @@ export class Player {
 
   setInput(input) {
     const key = input.pop();
-   
+
     if (!this.dead) {
       if ([Keys.W, Keys.S, Keys.A, Keys.D].includes(key) && !this.moveQueue.includes(key)) {
 
         this.moveQueue.push(key);
-       
+
       } else if (key === Keys.E || key === Keys.R || key === Keys.T) {
         this.useAbility(key);
       }
@@ -162,6 +170,7 @@ export class Player {
   }
 
   addLandToTail(land) {
+
     this.game.map.setTile({ x: land.x, y: land.y, playerId: land.playerId, color: this.tailColor, oldColor: land.color, hasTail: true, tailOwner: this.user.id });
     return this.tail.push(land);
   }
@@ -209,7 +218,7 @@ export class Player {
     for (let i = 1; i < height; i++) {
       for (let j = 1; j < width; j++) {
         let tile = this.game.map.getTile(minY + i - 1, minX + j - 1);
-        if (tile.color === this.color && !tile.hasTail) {
+        if (tile.color === this.color && tile.tailOwner !== this.user.id) {
           helpTiles.set(`${i},${j}`, -1);
         }
       }
@@ -249,6 +258,7 @@ export class Player {
     } else if (this.y < this.area.minY) {
       this.area.minY = this.y;
     }
+  
   }
 
 
@@ -376,6 +386,7 @@ export class Player {
       this.decreaseScore(200);
     }
     this.direction = Direction.NONE;
+   
     this.speed = 10;
     this.hasArrived = true;
     this.moveQueue = [];
@@ -495,7 +506,7 @@ export class Player {
       duration: this.activeAbility ? this.activeAbility.duration : ''
     }
 
-    
+
     return {
       nickname: this.user.name,
       color: this.color,
