@@ -94,11 +94,11 @@ export class GameMap {
     }
 
     getRandomRow(borderBuffer) {
-        return Math.floor(Math.random() * (this.rows - 4 * borderBuffer)) + borderBuffer;
+        return Math.floor(Math.random() * (this.rows - 4 * borderBuffer)) + 2;
     }
 
     getRandomCol(borderBuffer) {
-        return Math.floor(Math.random() * (this.cols - 4 * borderBuffer)) + borderBuffer;
+        return Math.floor(Math.random() * (this.cols - 4 * borderBuffer)) + 2;
     }
 
     isOccupied(tile) {
