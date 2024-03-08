@@ -1,15 +1,16 @@
 import { SpeedAbility, SlowAbility, SelfImmunityAbility, EnhancedVisionAbility, TeleportAbility } from './ability.js';
 import { Bonus } from "./bonus.js";
 import { ColorSystem } from "./color.js";
+import _ from 'lodash';
 export class Game {
     constructor(id, gameMap, mode, gameTimer) {
         this.id = id;
         this.map = gameMap;
         this.gameTimer = gameTimer;
         this.gameOver = false;
-        this.abilitySpawnInterval =  30 * 1000;
+        this.abilitySpawnInterval = 30 * 1000;
         this.lastAbilitySpawnTimer = 0;
-        this.bonusSpawnInterval =  30 * 1000;
+        this.bonusSpawnInterval = 30 * 1000;
         this.lastBonusSpawnTimer = 0;
         this.abilities = [];
         this.bonuses = [];
@@ -18,7 +19,7 @@ export class Game {
         this.mode = mode;
 
         this.lastFrameTime = performance.now();
-
+        this.previousState = {};
     }
     update() {
         const currentFrameTime = performance.now();
@@ -41,14 +42,14 @@ export class Game {
             } else {
                 this.lastBonusSpawnTimer += deltaTime;
             }
-            
+
             for (const id in this.players) {
                 const player = this.players[id];
 
                 player.update(deltaTime);
 
-              
-                if (player.getCountTiles() === this.map.countTiles())  this.gameOver = true;
+
+                if (player.getCountTiles() === this.map.countTiles()) this.gameOver = true;
 
             }
 
@@ -61,7 +62,7 @@ export class Game {
 
     spawnAbility() {
         const allAbilities = [SpeedAbility, SlowAbility, SelfImmunityAbility, EnhancedVisionAbility, TeleportAbility];
-       
+
         for (let i = 0; i < 5; i++) {
 
             const Ability = allAbilities[Math.floor(Math.random() * allAbilities.length)];
@@ -77,18 +78,18 @@ export class Game {
     }
     spawnBonus() {
         const bonuses = ['SCORE_X2', 'SCORE_X4', 'SCORE_X8', 'KILL_X2'];
-    
+
         for (let i = 0; i < 5; i++) {
             const randomIndex = Math.floor(Math.random() * bonuses.length);
             const randomName = bonuses[randomIndex];
-    
+
             const col = Math.floor(Math.random() * this.map.cols);
             const row = Math.floor(Math.random() * this.map.rows);
             const tile = this.map.getTile(row, col);
-    
+
             const duration = Math.floor(Math.random() * 5) + 10;
             const bonus = new Bonus(tile.x, tile.y, randomName, duration * 1000);
-    
+
             this.bonuses.push(bonus);
         }
     }
@@ -146,7 +147,8 @@ export class Game {
     deadMessage(deadInterval, deadTime) {
 
         let messageDead = 'Wyelimowano cię!';
-        let messageTime = `Powrócisz na planszę za: ${Math.ceil((deadInterval * 0.001) - (deadTime * 0.001).toFixed(1))}`;
+        let time = (deadInterval * 0.001) - (deadTime * 0.001);
+        let messageTime = `Powrócisz na planszę za: ${Math.ceil(time)}`;
 
         return [messageDead, messageTime];
     }
@@ -168,10 +170,10 @@ export class Game {
         leaderboard.sort((a, b) => b.score - a.score);
         return leaderboard;
     }
-    toJSON(playerId) { 
-        const me = this.players[playerId].toJSON();
-        const backendPlayers = {};
 
+    toJSON(playerId) {
+
+        const backendPlayers = {};
         for (const id in this.players) {
             if (id !== playerId && !this.players[id].dead) {
                 backendPlayers[id] = {
@@ -183,28 +185,23 @@ export class Game {
             }
         }
 
-        const map = this.map.toJSON();
-        const bonuses = this.bonuses.map(bonus => bonus.toJSON());
-        const abilities = this.abilities.map(ability => ability.toJSON());
-
-        let leaderBoard;
-        if (this.mode === 'team') {
-            leaderBoard = this.getTeamLeaderboard();
-        } else {
-            leaderBoard = this.getLeaderboard();
-        }
-    
-        return {
+        const currentState = {
             mode: this.mode,
-            map: map,
-            gameTimer: Math.round(this.gameTimer),
-            abilities: abilities,
-            bonuses: bonuses,
-            gameOver: this.gameOver,
-            me: me,
+            map: this.map.toJSON(),
+            gameTimer: Math.trunc(this.gameTimer),
+            abilities: this.abilities.map(ability => ({
+                x: ability.position.x,
+                y: ability.position.y,
+                name: ability.name
+            })),
+            bonuses: this.bonuses.map(bonus => bonus.toJSON()),
+            me: this.players[playerId].toJSON(),
             players: backendPlayers,
-            leaderBoard: leaderBoard,
+            leaderBoard: this.mode !== 'team' ? this.getLeaderboard() : this.getTeamLeaderboard(),
+
         };
+      
+        return currentState;
     }
 
 }

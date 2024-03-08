@@ -23,6 +23,7 @@ if (process.env.NODE_ENV === 'development') {
 
   const compiler = webpack(webpackConfig);
   app.use(webpackDevMiddleware(compiler));
+  
 } else {
  
   app.use(express.static(path.join(__dirname, '../dist')));
@@ -33,7 +34,6 @@ const port = process.env.PORT || 8080;
 server.listen(port, () => {
   console.log(`Serwer działa na porcie: ${port}`);
 });
-
 
 const network = new Network(io);
 

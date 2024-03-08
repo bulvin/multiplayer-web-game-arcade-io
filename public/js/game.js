@@ -5,7 +5,7 @@ import { Ability } from "./ability.js"
 import { Bonus } from "./bonus.js";
 import { InputHandler } from "./input.js";
 import { UI } from "./ui.js";
-
+import { debounce } from "throttle-debounce";
 
 export class Game {
     constructor({ mode, map, gameTimer, me, leaderBoard }) {
@@ -23,6 +23,12 @@ export class Game {
             x: me.x,
             y: me.y,
         }, this);
+        this.me.dead = me.dead;
+        this.me.score = me.score;
+        this.me.kills = me.kills;
+        this.me.territory = me.territory;
+        this.me.deaths = me.deaths;
+
         this.map = new GameMap(this, map);
         this.camera = new Camera(this);
         this.ui = new UI(this);
@@ -35,7 +41,7 @@ export class Game {
         this.abilities = [];
         this.bonuses = [];
 
-        window.addEventListener("resize", this.resizeCanvas.bind(this));
+        window.addEventListener("resize", debounce(40, this.resizeCanvas.bind(this)));
         this.canvas.addEventListener("wheel", (event) => event.preventDefault());
 
 
@@ -44,18 +50,10 @@ export class Game {
 
     }
     update(gameData) {
-
-        for (const playerID in this.players) {
-            if (!gameData.players[playerID]) {
-                delete this.players[playerID];
-            }
-        }
-        const backendPlayer = gameData.me;
-
+       
         this.gameTimer = gameData.gameTimer;
         this.map.update(gameData.map);
-        this.me.update(backendPlayer);
-
+        this.me.update(gameData.me);
 
         for (const playerId in gameData.players) {
             const backendPlayer = gameData.players[playerId];
@@ -68,16 +66,21 @@ export class Game {
             }
         }
 
+        for (const playerId in this.players) {
+            if (!gameData.players[playerId]) {
+                delete this.players[playerId];
+            }
+        }
+
         this.abilities = [];
         for (const abilityInfo of gameData.abilities) {
             this._receiveAbilityUpdate(abilityInfo);
-
         }
+
 
         this.bonuses = [];
         for (const bonusInfo of gameData.bonuses) {
             this._receiveBonusUpdate(bonusInfo);
-
         }
 
         this.leaderBoard = gameData.leaderBoard;
@@ -150,7 +153,7 @@ export class Game {
     }
     _receiveAbilityUpdate(abilityInfo) {
         const { name, x, y } = abilityInfo;
-        const frontendAbility = new Ability(this, name, abilityInfo.duration, x * this.map.tileSize, y * this.map.tileSize);
+        const frontendAbility = new Ability(this, name, x * this.map.tileSize, y * this.map.tileSize);
         this.abilities.push(frontendAbility);
 
     }
@@ -161,11 +164,12 @@ export class Game {
         this.bonuses.push(frontendBonus);
 
     }
+
     resizeCanvas() {
         const newWidth = window.innerWidth;
         const newHeight = window.innerHeight;
 
-        const devicePixelRatio = window.devicePixelRatio || 1;
+        this.devicePixelRatio = window.devicePixelRatio || 1;
 
         const originalWidth = this.canvas.width;
         const originalHeight = this.canvas.height;

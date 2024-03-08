@@ -9,7 +9,7 @@ export class Player {
     this.psize = 32;
     this.x = spawn.x;
     this.y = spawn.y;
-    this.speed = 10;
+    this.speed = 12;
     this.color = color.playerColor;
     this.tailColor = color.tailColor;
     this.lands = [];
@@ -499,13 +499,13 @@ export class Player {
     const territory = this.getTerritoryPercentage();
     const bonus = {
       name: this.activeBonus ? this.activeBonus.name : '',
-      duration: this.activeBonus ? this.activeBonus.duration : ''
+      duration: this.activeBonus ? Math.trunc(this.activeBonus.duration) : ''
     }
     const ability = {
       name: this.activeAbility ? this.activeAbility.name : '',
-      duration: this.activeAbility ? this.activeAbility.duration : ''
+      duration: this.activeAbility ? Math.trunc(this.activeAbility.duration) : ''
     }
-
+ 
 
     return {
       nickname: this.user.name,

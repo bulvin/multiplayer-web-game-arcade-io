@@ -1,12 +1,11 @@
 export class Ability {
-    constructor(game, name, duration, x, y){
+    constructor(game, name, x, y){
         this.game = game;
         this.position = {
             x : x,
             y : y
         };
         this.name = name;
-        this.duration = duration;
         
     }
     draw() {

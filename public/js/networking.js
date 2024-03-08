@@ -10,7 +10,7 @@ const socket = io(`${window.location.host}`, { transports: ["websocket"] });
 
 const enterNickname = (nickname) => socket.emit("join", nickname);
 
-const sendPlayerInput = (input) => throttle(socket.emit("playerInput", input), 20);
+const sendPlayerInput = (input) => throttle(socket.emit("playerInput", input), 15);
 
 const createRoom = (name, maxPlayers) =>  socket.emit("createRoom", { name: name, maxPlayers: maxPlayers,});
 
@@ -52,7 +52,7 @@ socket.on("updateGame", (backendGame) => {
     };
     
     const newGameView = createGame(gameData);
- 
+
     displayElement(elements.lobby, "none")
     displayElement(elements.canvas, "block");
   }

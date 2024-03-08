@@ -53,7 +53,7 @@ export class UI {
     
         const x = this.game.canvas.width * 0.5;
         const y = this.game.map.tileSize * 3;
-        const formattedTimerText = (this.formattedTimer !== '00:00' && parseInt(this.formattedTimer) >= 0) ? `Czas: ${this.formattedTimer}` : '';
+        const formattedTimerText = (Number(this.formattedTimer) < 0) ? `Czas: ${this.formattedTimer}` : '';
         this.drawText(formattedTimerText, x, y, 'center');
     }
     drawScoreBoard() {
@@ -72,7 +72,7 @@ export class UI {
         this.setFillAndStroke('hsla(180, 0%, 10%, 0.5)', borderColor, borderWidth);
         this.drawRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, adjustedScoreboardHeight + 10);
     
-        this.setFillAndFont(this.color, `${this.fontSize - 10}px ${this.fontFamily}`);
+        this.setFillAndFont('white', `${this.fontSize - 10}px ${this.fontFamily}`);
     
         const headerX = this.scoreboardX + this.scoreboardWidth * 0.05;
         const headerY = this.scoreboardY + 15;
@@ -81,6 +81,7 @@ export class UI {
     }
     
     drawHeaders(headerX, headerY, leaderBoard) {
+      
         const columnWidth = this.scoreboardWidth / 4;
     
         const positionX = headerX;
@@ -166,7 +167,7 @@ export class UI {
                 const abilityX = x + i * rectWidth + rectWidth / 2;
                 this.drawIconAbility(ability.name, abilityX, abilityY);
     
-                if (this.game.me.activeAbility && ability.name === this.game.me.activeAbility.name && this.game.me.activeAbility.duration >= 0) {
+                if (this.game.me.activeAbility && ability.name === this.game.me.activeAbility.name && this.game.me.activeAbility.duration > 0) {
                     this.setFillAndFont('red', `bold ${this.fontSize - 10}px ${this.fontFamily}`);
                     const durationText = `${Math.ceil(this.game.me.activeAbility.duration * 0.001)}s`;
                     const durationX = x + i * rectWidth + rectWidth - 10; 
