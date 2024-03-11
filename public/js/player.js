@@ -53,7 +53,5 @@ export class Player {
     move() {
         this.x = this.game.lerp(this.x, this.target.x, 0.5);
         this.y = this.game.lerp(this.y, this.target.y, 0.5);
-    
-    
     }
 }

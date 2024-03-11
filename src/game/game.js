@@ -1,7 +1,7 @@
 import { SpeedAbility, SlowAbility, SelfImmunityAbility, EnhancedVisionAbility, TeleportAbility } from './ability.js';
 import { Bonus } from "./bonus.js";
 import { ColorSystem } from "./color.js";
-import _ from 'lodash';
+
 export class Game {
     constructor(id, gameMap, mode, gameTimer) {
         this.id = id;
@@ -17,79 +17,76 @@ export class Game {
         this.players = {};
         this.colors = new ColorSystem();
         this.mode = mode;
-
         this.lastFrameTime = performance.now();
-        this.previousState = {};
     }
     update() {
         const currentFrameTime = performance.now();
         const deltaTime = currentFrameTime - this.lastFrameTime;
         this.lastFrameTime = currentFrameTime;
         if (this.gameTimer >= 0) {
-
             this.gameTimer -= deltaTime;
-
             if (this.lastAbilitySpawnTimer > this.abilitySpawnInterval) {
                 this.lastAbilitySpawnTimer = 0;
                 this.spawnAbility();
             } else {
                 this.lastAbilitySpawnTimer += deltaTime;
             }
-
             if (this.lastBonusSpawnTimer > this.bonusSpawnInterval) {
                 this.lastBonusSpawnTimer = 0;
                 this.spawnBonus();
             } else {
                 this.lastBonusSpawnTimer += deltaTime;
             }
-
             for (const id in this.players) {
                 const player = this.players[id];
-
                 player.update(deltaTime);
-
-
                 if (player.getCountTiles() === this.map.countTiles()) this.gameOver = true;
-
             }
-
         } else {
             this.gameOver = true;
         }
-
     }
-
-
     spawnAbility() {
         const allAbilities = [SpeedAbility, SlowAbility, SelfImmunityAbility, EnhancedVisionAbility, TeleportAbility];
-
+    
         for (let i = 0; i < 5; i++) {
-
+    
+            if (this.abilities.length >= 20) {
+                return;
+            }
+    
             const Ability = allAbilities[Math.floor(Math.random() * allAbilities.length)];
-            const x = Math.floor(Math.random() * this.map.cols);
-            const y = Math.floor(Math.random() * this.map.rows);
-
+            let x, y;
+    
+            do {
+                x = Math.floor(Math.random() * this.map.cols);
+                y = Math.floor(Math.random() * this.map.rows);
+            } while (this.isOccupied(x, y));
+    
             const newAbility = new Ability(x, y);
-
-
             this.abilities.push(newAbility);
         }
-
     }
+    
     spawnBonus() {
         const bonuses = ['SCORE_X2', 'SCORE_X4', 'SCORE_X8', 'KILL_X2'];
-
+    
         for (let i = 0; i < 5; i++) {
+            if (this.bonuses.length >= 20) {
+                return;
+            }
+    
             const randomIndex = Math.floor(Math.random() * bonuses.length);
             const randomName = bonuses[randomIndex];
-
-            const col = Math.floor(Math.random() * this.map.cols);
-            const row = Math.floor(Math.random() * this.map.rows);
-            const tile = this.map.getTile(row, col);
-
+            let x, y;
+    
+            do {
+                x = Math.floor(Math.random() * this.map.cols);
+                y = Math.floor(Math.random() * this.map.rows);
+            } while (this.isOccupied(x, y));
+    
             const duration = Math.floor(Math.random() * 5) + 10;
-            const bonus = new Bonus(tile.x, tile.y, randomName, duration * 1000);
-
+            const bonus = new Bonus(x, y, randomName, duration * 1000);
             this.bonuses.push(bonus);
         }
     }
@@ -152,6 +149,21 @@ export class Game {
 
         return [messageDead, messageTime];
     }
+    isOccupied(x, y) {
+        for (let ability of this.abilities) {
+            if (ability.x === x && ability.y === y) {
+                return true;
+            }
+        }
+    
+        for (let bonus of this.bonuses) {
+            if (bonus.x === x && bonus.y === y) {
+                return true;
+            }
+        }
+    
+        return false;
+    }
     getEndLeaderboard() {
         const leaderboard = [];
         for (const id in this.players) {
@@ -172,7 +184,6 @@ export class Game {
     }
 
     toJSON(playerId) {
-
         const backendPlayers = {};
         for (const id in this.players) {
             if (id !== playerId && !this.players[id].dead) {
@@ -188,17 +199,12 @@ export class Game {
         const currentState = {
             mode: this.mode,
             map: this.map.toJSON(),
-            gameTimer: Math.trunc(this.gameTimer),
-            abilities: this.abilities.map(ability => ({
-                x: ability.position.x,
-                y: ability.position.y,
-                name: ability.name
-            })),
+            gameTimer: this.gameTimer,
+            abilities: this.abilities.map(ability => ability.toJSON()),
             bonuses: this.bonuses.map(bonus => bonus.toJSON()),
             me: this.players[playerId].toJSON(),
             players: backendPlayers,
             leaderBoard: this.mode !== 'team' ? this.getLeaderboard() : this.getTeamLeaderboard(),
-
         };
       
         return currentState;

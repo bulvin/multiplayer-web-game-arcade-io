@@ -1,3 +1,4 @@
+
 export class GameController {
     constructor(game, roomController, playersControllers) {
         this.game = game;
@@ -7,11 +8,9 @@ export class GameController {
         this.loop = null;
         this.executeTick();
     }
-
     executeTick() {
         this.loop = setTimeout(this.nextTick.bind(this), this.tickRate);
     }
-
     nextTick() {
         if (!this.game.gameOver) {
             this.sendGameUpdate();
@@ -29,19 +28,14 @@ export class GameController {
             }, 11 * 1000);
         }
     }
-
-    sendGameUpdate() {
-      
+    sendGameUpdate() {     
         this.game.update();
-
         this.playersControllers.forEach(playerController => {
             playerController.sendUpdate(this.game);
 
         });
-
         this.game.map.updatedTiles = [];
     }
-
     cancelTick() {
         if (this.loop) {
             clearTimeout(this.loop);

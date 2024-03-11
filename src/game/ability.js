@@ -8,7 +8,15 @@ class Ability {
         this.duration = duration;
         
     }
-    
+    use(player) {
+        throw new Error('use(player) method not implemented');
+    }
+    reset(player) {
+        throw new Error('reset(player) method not implemented');
+    }
+    update(player, deltaTime) {
+        throw new Error('update(player, deltaTime) method not implemented');
+    }
     removeBind(player) {
         for (const key of Object.keys(player.abilitiesBinds)) { 
             if (player.abilitiesBinds[key] === player.activeAbility) {
@@ -35,7 +43,6 @@ class SpeedAbility extends Ability {
         super(x, y, "PRĘDKOŚĆ", 5000);
         
     }
-
     use(player) {
         player.speed *= 2;
     }

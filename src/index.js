@@ -16,7 +16,6 @@ const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
 
-
 app.use(express.json());
 
 if (process.env.NODE_ENV === 'development') {

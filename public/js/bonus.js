@@ -9,10 +9,10 @@ export class Bonus {
     }
 
     draw() {
-        const tileSizeHalf = this.game.map.tileSize / 2;
-        const x = this.position.x  - this.game.camera.x ;
-        const y = this.position.y - this.game.camera.y + Math.sin(performance.now() / 300) * (tileSizeHalf / 4);
-    
+        const animationOffset = Math.sin(performance.now() / 500) * (this.game.map.tileSize / 4);
+        const x = this.position.x - this.game.camera.x + this.game.map.tileSize / 2;
+        const y = this.position.y - this.game.camera.y + this.game.map.tileSize / 2 + animationOffset;
+        let circleColor = '#ffffff';
         let strokeColor = '#ffffff';
 
         let name = this.name;
@@ -24,16 +24,20 @@ export class Bonus {
             name = "x8";
         } else if (name === "KILL_X2") {
             name = "x2"
-            strokeColor = 'hsl(0, 100%, 50%)';
+            circleColor = 'hsl(0, 100%, 50%)';
+            strokeColor = 'hsl(0, 100%, 50%)'; // blood color
         }
     
-        this.game.ctx.save();
-        this.game.ctx.lineWidth = 10;
-        this.game.ctx.strokeStyle = strokeColor;
-        this.game.ctx.beginPath();
-        this.game.ctx.arc(x, y, tileSizeHalf, 0, 2 * Math.PI , false);
-        this.game.ctx.stroke();
+        const radius = this.game.map.tileSize / 2;
     
+        this.game.ctx.save();
+        this.game.ctx.fillStyle = circleColor;
+        this.game.ctx.strokeStyle = strokeColor;
+        this.game.ctx.lineWidth = 4;   
+        this.game.ctx.beginPath();
+        this.game.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        this.game.ctx.stroke();
+
         this.game.ctx.font = '16px Helvetica';
         this.game.ctx.fillStyle = 'white';
         this.game.ctx.textAlign = 'center';

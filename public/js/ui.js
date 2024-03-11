@@ -7,7 +7,7 @@ export class UI {
         this.messages = [];
         this.scoreboardX = 20;
         this.scoreboardY = 20;
-        this.scoreboardWidth = this.game.canvas.width * 0.2;
+        this.scoreboardWidth = 400;
         this.verticalSpacing = this.fontSize * 0.5;
 
         this.titleSpacing = this.fontSize * 0.8;
@@ -35,7 +35,6 @@ export class UI {
                     this.messages = [];
                 }
               
-                
             }
         }
        
@@ -45,7 +44,7 @@ export class UI {
         this.game.ctx.fillStyle = this.color;
       
         this.game.ctx.font = `${this.fontSize + 15}px ${this.fontFamily}`;
-    
+        console.log(this.game.gameTimer);
         const minutes = Math.floor(this.game.gameTimer / (60 * 1000));
         const seconds = Math.floor((this.game.gameTimer % (60 * 1000)) / 1000);
     
@@ -53,7 +52,7 @@ export class UI {
     
         const x = this.game.canvas.width * 0.5;
         const y = this.game.map.tileSize * 3;
-        const formattedTimerText = (Number(this.formattedTimer) < 0) ? `Czas: ${this.formattedTimer}` : '';
+        const formattedTimerText = (this.game.gameTimer > 0) ? `Czas: ${this.formattedTimer}` : '';
         this.drawText(formattedTimerText, x, y, 'center');
     }
     drawScoreBoard() {

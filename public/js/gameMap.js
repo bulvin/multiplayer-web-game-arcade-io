@@ -39,11 +39,8 @@ export class GameMap {
                 const y = row * this.tileSize - cameraY;
                 this.game.ctx.fillStyle = tile.color;
                 this.game.ctx.fillRect(x, y, this.tileSize , this.tileSize);
-
             }
         }
-
-
     }
 
 

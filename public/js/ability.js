@@ -9,8 +9,9 @@ export class Ability {
         
     }
     draw() {
+        const animationOffset = Math.sin(performance.now() / 500) * (this.game.map.tileSize / 4);
         const x = this.position.x - this.game.camera.x + this.game.map.tileSize / 2;
-        const y = this.position.y  - this.game.camera.y + this.game.map.tileSize / 2 + Math.sin(performance.now() / 1000) * (this.game.map.tileSize / 4);
+        const y = this.position.y - this.game.camera.y + this.game.map.tileSize / 2 + animationOffset;
         let circleColor;
         
         if (this.name === "PRĘDKOŚĆ") {
@@ -28,6 +29,7 @@ export class Ability {
         const radius = this.game.map.tileSize / 2;
     
         this.game.ctx.save();
+      
         this.game.ctx.fillStyle = circleColor;
         this.game.ctx.shadowColor = circleColor;
         this.game.ctx.shadowBlur = 15;

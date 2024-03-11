@@ -16,7 +16,7 @@ import { formatMessage } from "../utils/formatMessage.js";
 
 
 export class Network {
-  constructor(io) {
+  constructor(io) { 
     this.io = io;
     this.userControllers = new Map();
     this.roomControllers = new Map();
@@ -27,12 +27,9 @@ export class Network {
     globalEmitter.on("removeGame", (gameId) => this.removeGame(gameId));
 
   }
-
   onConnection(socket) {
     console.log(`Użytkownik połączył się o id ${socket.id}`);
-
     socket.on("join", (nickname) => {
-
       const joined = this.onJoin(socket, nickname);
 
       if (joined) {
@@ -45,7 +42,6 @@ export class Network {
             this.registerGameEvents(socket);
           }
         })
-
         socket.on("createRoom", (data) => {
           const created = this.createRoom(socket, data)
           if (created) {
@@ -53,20 +49,16 @@ export class Network {
             this.registerGameEvents(socket);
           }
         });
-
       }
     });
-
     socket.on("disconnect", (reason) => this.disconnect(socket, reason));
   }
 
   registerGameEvents(socket) {
     socket.emit("joinedOrCreated");
-
     socket.on("receiveMessage", (data) => this.sendMessage(socket, data));
     socket.on("startGame", (gameData) => this.onStartGame(socket, gameData));
     socket.on("gameFormUpdate", (gameData) => this.onUpdateGameForm(socket, gameData));
-
     socket.on("leaveRoom", () => this.leaveRoom(socket));
 
   }

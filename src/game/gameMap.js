@@ -9,7 +9,6 @@ export class GameMap {
         this.initTiles();
         this.updatedTiles = [];
         this.occupiedSpawns = [];
-        this.spawnDistance = 5;
 
     }
     getTile(row, col) {
@@ -104,13 +103,13 @@ export class GameMap {
     isOccupied(tile) {
         for (let i = 0; i < this.occupiedSpawns.length; i++) {
             const spawn = this.occupiedSpawns[i];
-            if (spawn.x === tile.x && spawn.y === tile.y || tile.playerId  !== 0) {
+            if (spawn.x === tile.x && spawn.y === tile.y) {
                 return true;
             }
         }
 
-        for (let row = -1; row < 2; row++) {
-            for (let col = -1; col < 2; col++) {
+        for (let row = -1; row <= 1; row++) {
+            for (let col = -1; col <= 1; col++) {
                 const newRow = tile.y + row;
                 const newCol = tile.x + col;
 

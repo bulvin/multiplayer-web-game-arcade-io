@@ -28,7 +28,7 @@ export  class UserController {
 
     }
     sendMessage(message) {
-        if (message.trim() === "" || !message) return;
+        if (message.trim() === "" || !message || message.length > 255) return;
 
         this.socket.emit("message", formatMessage(this.user.name, message));
         this.socket.to(this.user.room).emit("message", formatMessage(this.user.name, message));

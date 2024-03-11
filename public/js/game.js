@@ -89,7 +89,6 @@ export class Game {
     draw() {
         this.map.drawTiles();
         this.map.drawGrid();
-
         if (!this.me.dead) {
             this.me.draw();
         }
@@ -108,7 +107,6 @@ export class Game {
             bonus.draw();
         }
         this.ui.draw();
-
     }
     animate() {
         this.animationId = requestAnimationFrame(this.animate.bind(this));

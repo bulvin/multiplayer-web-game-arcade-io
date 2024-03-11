@@ -25,7 +25,6 @@ function isValidRoomName(name, roomControllers) {
       return { isValid: false, error: "Pokój z tą nazwą już istnieje!" };
     }
   }
-
   return { isValid: true };
 }
 
@@ -72,8 +71,6 @@ function isValidJoinRoom(room) {
   return { isValid: true };
 
 }
-
-
 
 export {
   isValidNickname,

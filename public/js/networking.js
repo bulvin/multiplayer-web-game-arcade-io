@@ -35,7 +35,7 @@ socket.on("error", (errorMessage) => showError(errorMessage));
 
 socket.on("updateGame", (backendGame) => {
   const frontendGame = getGame();
-
+  
   if (frontendGame) {
     frontendGame.update(backendGame);
   }

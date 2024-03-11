@@ -29,7 +29,6 @@ export class Player {
     this.moveQueue = [];
     this.hasArrived = true;
     this.noHitSelf = false;
-    this.visionScale = 1;
     this.killMultiplier = 1;
     this.team = team;
     this.area = {
@@ -38,7 +37,7 @@ export class Player {
       minY: this.y - Math.floor(SPAWN_SIZE * 0.5),
       maxY: this.y + Math.floor(SPAWN_SIZE * 0.5)
     }
-  
+
   }
 
   update(deltaTime) {
@@ -47,25 +46,10 @@ export class Player {
       return;
     }
 
+    this.updateMovement(deltaTime);
     this.checkTakeEffects();
-
-    if (this.activeAbility) {
-      this.activeAbility.update(this, deltaTime);
-    }
-
-    if (this.activeBonus) {
-      this.activeBonus.duration -= deltaTime;
-
-      if (this.activeBonus.duration <= 0) {
-        this.resetBonusEffect();
-      }
-    }
-
-    if (this.hasArrived && this.moveQueue.length > 0) {
-      const newDir = this.moveQueue.shift();
-      this.setDirection(newDir);
-    }
-    this.move(deltaTime);
+    this.updateAbility(deltaTime);
+    this.updateBonus(deltaTime);
 
     if (this.isHitInBorders() || this.lands.length === 0) {
       this.die();
@@ -74,34 +58,32 @@ export class Player {
 
     if (this.hasArrived) {
       const land = this.game.map.getTile(this.y, this.x);
-      this.updateAreaPositions();
-      
-      if (this.isHitSelf(land)) {
-        this.die();
+      this.checkLand(land);
+    }
+  }
+  updateAbility(deltaTime) {
+    if (this.activeAbility) {
+      this.activeAbility.update(this, deltaTime);
+    }
+  }
 
-      } else if (this.isHitOther(land)) {
-        const otherPlayer = Object.values(this.game.players).find(player => player.user.id === land.tailOwner);
-        if (otherPlayer) {
-          this.kill(otherPlayer, land);
-        }
-      } else if (land.color !== this.color && !land.hasTail) {
-        const otherPlayer = Object.values(this.game.players).find(player => player.user.id === land.playerId);
-        if (otherPlayer && otherPlayer.x === land.x && otherPlayer.y === land.y) {
-          this.die();
+  updateBonus(deltaTime) {
+    if (this.activeBonus) {
+      this.activeBonus.duration -= deltaTime;
 
-        } else {
-          this.addLandToTail(land);
-        }
-
-      } else if (this.color === land.color && this.tail.length > 0) {
-        this.takeArea();
-
-        this.tail = [];
+      if (this.activeBonus.duration <= 0) {
+        this.resetBonusEffect();
       }
     }
   }
 
-
+  updateMovement(deltaTime) {
+    if (this.hasArrived && this.moveQueue.length > 0) {
+      const newDir = this.moveQueue.shift();
+      this.setDirection(newDir);
+    }
+    this.move(deltaTime);
+  }
 
   move(deltaTime) {
     if (this.hasArrived) {
@@ -168,6 +150,20 @@ export class Player {
       this.deadTimer += deltaTime;
     }
   }
+  checkLand(land) {
+    this.updateAreaPositions();
+
+    if (this.isHitSelf(land)) {
+      this.die();
+    } else if (this.isHitOther(land)) {
+      this.hitOther(land);
+    } else if (land.color !== this.color && !land.hasTail) {
+      this.makeTail(land);
+    } else if (this.color === land.color && this.tail.length > 0) {
+      this.takeArea();
+      this.tail = [];
+    }
+  }
 
   addLandToTail(land) {
 
@@ -183,7 +179,6 @@ export class Player {
       player.removeTilesFromTerritory(tiles);
     }
 
-
   }
 
   fillArea() {
@@ -191,17 +186,14 @@ export class Player {
     const maxX = this.area.maxX;
     const minY = this.area.minY;
     const maxY = this.area.maxY;
-
-    const lostTiles = new Map();
-
     const width = maxX - minX + 2;
     const height = maxY - minY + 2;
-
-    const helpTiles = new Map();
+    const areaTiles = new Map();
+    const lostTiles = new Map();
 
     for (let i = 0; i < height + 1; i++) {
       for (let j = 0; j < width + 1; j++) {
-        helpTiles.set(`${i},${j}`, 0);
+        areaTiles.set(`${i},${j}`, 0);
       }
     }
 
@@ -209,29 +201,26 @@ export class Player {
     for (let i = 1; i < height; i++) {
       for (let j = 1; j < width; j++) {
         tile = this.game.map.getTile(minY + i - 1, minX + j - 1);
-        helpTiles.set(`${i},${j}`, tile.color);
+        areaTiles.set(`${i},${j}`, tile.color);
       }
     }
     const color = { playerColor: this.color, tailColor: this.tailColor }
-    startFillEnclosedArea(helpTiles, 0, 0, color);
+    startFillEnclosedArea(areaTiles, 0, 0, color);
 
     for (let i = 1; i < height; i++) {
       for (let j = 1; j < width; j++) {
         let tile = this.game.map.getTile(minY + i - 1, minX + j - 1);
         if (tile.color === this.color && tile.tailOwner !== this.user.id) {
-          helpTiles.set(`${i},${j}`, -1);
+          areaTiles.set(`${i},${j}`, -1);
         }
       }
     }
 
     let scoreFromNewTiles = 0;
-    for (let [key, value] of helpTiles) {
-
+    for (let [key, value] of areaTiles) {
       if (value !== -1) {
-
         const [i, j] = key.split(",").map(Number);
         tile = this.game.map.getTile(minY + i - 1, minX + j - 1);
-
         addLostTile(lostTiles, tile.playerId, tile);
 
         this.game.map.setTile({ x: tile.x, y: tile.y, playerId: this.user.id, color: this.color, hasTail: false, tailOwner: 0 });
@@ -258,7 +247,7 @@ export class Player {
     } else if (this.y < this.area.minY) {
       this.area.minY = this.y;
     }
-  
+
   }
 
 
@@ -297,6 +286,21 @@ export class Player {
     this.dead = true;
     this.deaths++;
     this.clear();
+  }
+  hitOther(land) {
+    const otherPlayer = Object.values(this.game.players).find(player => player.user.id === land.tailOwner);
+    if (otherPlayer) {
+      this.kill(otherPlayer, land);
+    }
+  }
+  makeTail(land) {
+    const otherPlayer = Object.values(this.game.players).find(player => player.user.id === land.playerId);
+    if (otherPlayer && otherPlayer.x === land.x && otherPlayer.y === land.y) {
+      this.die();
+
+    } else {
+      this.addLandToTail(land);
+    }
   }
   removeTilesFromTerritory(tiles) {
     this.lands = this.lands.filter(land => {
@@ -386,8 +390,8 @@ export class Player {
       this.decreaseScore(200);
     }
     this.direction = Direction.NONE;
-   
-    this.speed = 10;
+
+    this.speed = 12;
     this.hasArrived = true;
     this.moveQueue = [];
     if (this.activeBonus) {
@@ -414,7 +418,7 @@ export class Player {
       const bonusPosition = bonus.position;
       const distance = this.calculateDistance(this.x, this.y, bonusPosition.x, bonusPosition.y);
 
-      if (distance <= 1) {
+      if (distance <= 0) {
         this.applyBonusEffect(bonus);
         bonuses.splice(index, 1);
       }
@@ -467,10 +471,11 @@ export class Player {
     }
     this.activeBonus = null;
   }
+  
   initBase() {
-    const halfSpawnSize = Math.floor(SPAWN_SIZE * 0.5);
-    for (let row = -halfSpawnSize; row <= halfSpawnSize; row++) {
-      for (let col = -halfSpawnSize; col <= halfSpawnSize; col++) {
+    const spawn = Math.floor(SPAWN_SIZE * 0.5);
+    for (let row = -spawn ; row <= spawn; row++) {
+      for (let col = -spawn; col <= spawn; col++) {
         const newRow = this.y + row;
         const newCol = this.x + col;
 
@@ -505,7 +510,6 @@ export class Player {
       name: this.activeAbility ? this.activeAbility.name : '',
       duration: this.activeAbility ? Math.trunc(this.activeAbility.duration) : ''
     }
- 
 
     return {
       nickname: this.user.name,
