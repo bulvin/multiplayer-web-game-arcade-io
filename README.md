@@ -22,4 +22,4 @@ Control:
 
 ## License
 
-[CC0](https://github.com/bulvin/multiplayer-web-game-arcade-io?tab=CC0-1.0-1-ov-file)
+[CC-BY-SA](https://creativecommons.org/licenses/by-sa/4.0/legalcode)
