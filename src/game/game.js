@@ -40,7 +40,11 @@ export class Game {
             for (const id in this.players) {
                 const player = this.players[id];
                 player.update(deltaTime);
-                if (player.getCountTiles() === this.map.countTiles()) this.gameOver = true;
+                if (player.getCountTiles() === this.map.countTiles() || player.team?.lands.length === this.map.countTiles()) {
+                    this.gameOver = true;
+                    return;
+                } 
+                
             }
         } else {
             this.gameOver = true;
@@ -49,7 +53,7 @@ export class Game {
     spawnAbility() {
         const allAbilities = [SpeedAbility, SlowAbility, SelfImmunityAbility, EnhancedVisionAbility, TeleportAbility];
     
-        for (let i = 0; i < 5; i++) {
+        for (let i= 0; i < 5; i++) { 
     
             if (this.abilities.length >= 20) {
                 return;
@@ -117,6 +121,7 @@ export class Game {
     }
     getLeaderboard() {
         const leaderboard = [];
+    
         for (const id in this.players) {
             const player = this.players[id];
             const score = player.score;
@@ -127,7 +132,12 @@ export class Game {
                 territoryPercentage: territoryPercentage,
             });
         }
-        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard.sort((a, b) => {
+            if (b.score === a.score) {
+                return b.territoryPercentage - a.territoryPercentage;
+            }
+            return b.score - a.score;
+        });
         return leaderboard;
     }
     getTeamLeaderboard() {
@@ -137,7 +147,12 @@ export class Game {
             territoryPercentage: team.getTerritoryPercentage(this.map),
         }));
 
-        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard.sort((a, b) => {
+            if (b.score === a.score) {
+                return b.territoryPercentage - a.territoryPercentage;
+            }
+            return b.score - a.score;
+        });
 
         return leaderboard;
     }
@@ -179,7 +194,12 @@ export class Game {
                 team: player.team ? player.team.name : ''
             });
         }
-        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard.sort((a, b) => {
+            if (b.score === a.score) {
+                return b.territoryPercentage - a.territoryPercentage;
+            }
+            return b.score - a.score;
+        });
         return leaderboard;
     }
 

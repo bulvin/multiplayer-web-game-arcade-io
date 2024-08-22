@@ -16,4 +16,4 @@ export class Team {
       const teamTiles = this.lands.length;
       return ((teamTiles / totalTiles) * 100).toFixed(2);
     }
-  }
+}

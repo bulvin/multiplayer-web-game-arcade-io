@@ -24,6 +24,7 @@ export class UI {
             this.gameOver();
         }
         else {
+           
             this.updateTimer();
             this.drawScoreBoard();
             this.drawStats();
@@ -44,7 +45,7 @@ export class UI {
         this.game.ctx.fillStyle = this.color;
       
         this.game.ctx.font = `${this.fontSize + 15}px ${this.fontFamily}`;
-        console.log(this.game.gameTimer);
+    
         const minutes = Math.floor(this.game.gameTimer / (60 * 1000));
         const seconds = Math.floor((this.game.gameTimer % (60 * 1000)) / 1000);
     
@@ -57,56 +58,75 @@ export class UI {
     }
     drawScoreBoard() {
         const leaderBoard = this.game.leaderBoard;
-    
+        
         this.verticalSpacing = this.fontSize * 0.2;
         this.titleSpacing = this.fontSize * 0.8;
+        
+        const padding = 10;
+        const topMargin = 20;
+        
+        const headers = ['#', this.game.mode === 'team' ? 'Drużyna' : 'Gracz', 'Punkty', 'Teren'];
+        const columnWidths = this.calculateColumnWidths(headers, leaderBoard);
+        
+        const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0) + padding * 2;
+        const rowHeight = this.fontSize + this.verticalSpacing;
+        const totalHeight = (leaderBoard.length + 1) * rowHeight + topMargin + padding * 2;
     
-        const playerHeight = this.fontSize + this.verticalSpacing - 5;
-        const scoreboardHeight = 2 * this.titleSpacing + playerHeight * leaderBoard.length;
-        const borderWidth = 0.3;
-        const borderColor = 'white';
-    
-        const adjustedScoreboardHeight = scoreboardHeight - (leaderBoard.length * 0.5 * this.verticalSpacing);
-    
-        this.setFillAndStroke('hsla(180, 0%, 10%, 0.5)', borderColor, borderWidth);
-        this.drawRect(this.scoreboardX, this.scoreboardY, this.scoreboardWidth, adjustedScoreboardHeight + 10);
+        this.setFillAndStroke('hsla(0, 0%, 0%, 0.5)', 'white', 0.3);
+        this.drawRect(this.scoreboardX, this.scoreboardY, totalWidth, totalHeight);
     
         this.setFillAndFont('white', `${this.fontSize - 10}px ${this.fontFamily}`);
+        const startX = this.scoreboardX + padding;
+        const startY = this.scoreboardY + padding + topMargin;
     
-        const headerX = this.scoreboardX + this.scoreboardWidth * 0.05;
-        const headerY = this.scoreboardY + 15;
-    
-        this.drawHeaders(headerX, headerY, leaderBoard);
+        this.drawHeaders(startX, startY, headers, columnWidths);
+        this.drawContent(startX, startY + rowHeight, leaderBoard, columnWidths);
     }
     
-    drawHeaders(headerX, headerY, leaderBoard) {
-      
-        const columnWidth = this.scoreboardWidth / 4;
+    calculateColumnWidths(headers, leaderBoard) {
+        const ctx = this.game.ctx;
+        ctx.font = `${this.fontSize - 10}px ${this.fontFamily}`;
+        
+        return headers.map((header, index) => {
+            const headerWidth = ctx.measureText(header).width;
+            const contentWidths = leaderBoard.map(entity => {
+                switch(index) {
+                    case 0: return ctx.measureText(leaderBoard.indexOf(entity) + 1).width;
+                    case 1: return ctx.measureText(entity.name.substring(0, 15)).width;
+                    case 2: return ctx.measureText(entity.score).width;
+                    case 3: return ctx.measureText(`${entity.territoryPercentage}%`).width;
+                }
+            });
+            return Math.max(headerWidth, ...contentWidths) + 20; 
+        });
+    }
     
-        const positionX = headerX;
-        const nameX = positionX + columnWidth;
-        const scoreX = nameX + columnWidth; 
-        const territoryX = scoreX + columnWidth;
+    drawHeaders(startX, startY, headers, columnWidths) {
+        let currentX = startX;
+        headers.forEach((header, index) => {
+            this.drawText(header, currentX + columnWidths[index] / 2, startY, 'center');
+            currentX += columnWidths[index];
+        });
+    }
     
-        this.drawText('#', positionX, headerY + 5, 'center');
-        this.drawText(this.game.mode === 'team' ? 'Drużyna' : 'Gracz', nameX, headerY + 5, 'center');
-        this.drawText('Punkty', scoreX, headerY + 5 , 'center');
-        this.drawText('Teren', territoryX, headerY + 5, 'center');
-    
-        for (let i = 0; i < leaderBoard.length; i++) {
-            const entity = leaderBoard[i];
-            const y = this.scoreboardY + headerY + (i + 1) * (this.fontSize + this.verticalSpacing);
-    
-            this.drawText(i + 1, positionX, y - 20, 'center');
-    
+    drawContent(startX, startY, leaderBoard, columnWidths) {
+        leaderBoard.forEach((entity, rowIndex) => {
+            let currentX = startX;
+            const y = startY + rowIndex * (this.fontSize + this.verticalSpacing);
+            
+            this.drawText(rowIndex + 1, currentX + columnWidths[0] / 2, y, 'center');
+            currentX += columnWidths[0];
+       
             const displayName = entity.name.length > 15 ? entity.name.substring(0, 15) + '...' : entity.name;
-            this.drawText(displayName, nameX, y - 20, 'center');
-    
-            this.drawText(entity.score, scoreX, y - 20, 'center');
-            this.drawText(`${entity.territoryPercentage}%`, territoryX, y - 20, 'center');
-        }
+            this.drawText(displayName, currentX + columnWidths[1] / 2, y, 'center');
+            currentX += columnWidths[1];
+            
+            this.drawText(entity.score, currentX + columnWidths[2] / 2, y, 'center');
+            currentX += columnWidths[2];
+            
+            this.drawText(`${entity.territoryPercentage}%`, currentX + columnWidths[3] / 2, y, 'center');
+        });
     }
-    
     drawDeadMessage(mess, mess1) {
         const lineHeight = this.fontSize + 15;
         const textHeight = lineHeight * 4;
@@ -124,21 +144,36 @@ export class UI {
     }
     
     drawStats() {
-        const lineHeight = this.fontSize + 10;
+        const lineHeight = this.fontSize + 5;
         const x = this.game.canvas.width * 0.01;
         let y = this.game.canvas.height - lineHeight;
+        const padding = 10;
+        const lines = 4; 
+        const textTopMargin = 10; 
+    
+        this.game.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+        const texts = [
+            `Wyeliminowałeś: ${this.game.me.kills}`,
+            `Odpadłeś: ${this.game.me.deaths}`,
+            `Punkty: ${this.game.me.score}`,
+            `Zajęty teren: ${this.game.me.territory}%`
+        ];
+        const maxWidth = Math.max(...texts.map(text => this.game.ctx.measureText(text).width));
+    
+        const bgWidth = maxWidth + padding * 2;
+        const bgHeight = lineHeight * lines + padding * 2 + textTopMargin; 
+        const bgX = x - padding;
+        const bgY = y - bgHeight + lineHeight + padding;
+    
+        this.game.ctx.fillStyle = 'hsla(0, 0%, 0%, 0.5)'; 
+        this.game.ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
     
         this.setFillAndFont(this.color, `${this.fontSize}px ${this.fontFamily}`);
-  
-        this.drawText(`Wyeliminowałeś: ${this.game.me.kills}`, x, y, 'left');
-        y -= lineHeight;
-        this.drawText(`Odpadłeś: ${this.game.me.deaths}`, x, y, 'left');
-        y -= lineHeight;
-        this.drawText(`Punkty: ${this.game.me.score}`, x, y, 'left');
-        y -= lineHeight;
-        this.drawText(`Zajęty teren: ${this.game.me.territory}%`, x, y, 'left');
-    }
     
+        texts.forEach((text, index) => {
+            this.drawText(text, x, y   - (lines - 1 - index) * lineHeight + textTopMargin, 'left');
+        });
+    }
     drawAbilitiesUI() {
         let x = this.game.canvas.width * 0.45;
         let y = this.game.canvas.height * 0.9;
@@ -155,7 +190,7 @@ export class UI {
             const ability = this.game.me.abilities?.[keys[i].toLowerCase()];
             const rectWidth = this.game.map.tileSize * 2;
     
-            this.setFillAndStroke('hsla(180, 0%, 10%, 0.5)', borderColor, borderWidth);
+            this.setFillAndStroke('hsla(0, 0%, 0%, 0.5)', borderColor, borderWidth);
             this.drawRect(x + i * rectWidth, y, rectWidth, this.game.map.tileSize * 2);
     
             this.setFillAndFont('white', `${this.fontSize - 10}px ${this.fontFamily}`);
@@ -181,7 +216,7 @@ export class UI {
         const bonusWidth = this.game.map.tileSize * 2;
         const bonusHeight = this.game.map.tileSize * 2;
     
-        this.setFillAndStroke('hsla(180, 0%, 10%, 0.5)', borderColor, borderWidth);
+        this.setFillAndStroke('hsla(0, 0%, 0%, 0.5)', borderColor, borderWidth);
         this.drawRect(bonusX, bonusY, bonusWidth, bonusHeight);
     
         const bonusTitleX = bonusX + bonusWidth / 2;

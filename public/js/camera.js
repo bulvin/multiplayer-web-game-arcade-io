@@ -7,8 +7,8 @@ export class Camera {
     this.viewportWidth = game.canvas.width;
     this.viewportHeight = game.canvas.height;
     this.margin = 120;
-    this.maxX = game.map.width - this.viewportWidth + this.margin;
-    this.maxY = game.map.height - this.viewportHeight + this.margin;
+    this.lerpFactor = 0.5;
+    this.updateMaxBounds();
   }
 
   setTargetPlayer(player) {
@@ -18,22 +18,25 @@ export class Camera {
   setViewport(width, height) {
     this.viewportWidth = width;
     this.viewportHeight = height;
+    this.updateMaxBounds();
+  }
+
+  updateMaxBounds() {
     this.maxX = this.game.map.width - this.viewportWidth + this.margin;
     this.maxY = this.game.map.height - this.viewportHeight + this.margin;
   }
 
   update() {
-    if (this.targetPlayer) {
+    if (!this.targetPlayer) return;
 
-      const targetX = this.targetPlayer.target.x * this.game.map.tileSize - this.viewportWidth * 0.5;
-      const targetY = this.targetPlayer.target.y * this.game.map.tileSize - this.viewportHeight * 0.5;
+    const targetX = this.targetPlayer.target.x * this.game.map.tileSize - this.viewportWidth * 0.5;
+    const targetY = this.targetPlayer.target.y * this.game.map.tileSize - this.viewportHeight * 0.5;
 
-      this.maxX = this.game.map.width - this.viewportWidth + this.margin;
-      this.maxY = this.game.map.height - this.viewportHeight + this.margin;
+    this.x += (targetX - this.x) * this.lerpFactor;
+    this.y += (targetY - this.y) * this.lerpFactor;
 
-      this.x = this.game.lerp(this.x, Math.max(-this.margin, Math.min(targetX, this.maxX)), 0.5);
-      this.y = this.game.lerp(this.y, Math.max(-this.margin, Math.min(targetY, this.maxY)), 0.5);
-    }
+    this.x = Math.max(-this.margin, Math.min(this.x, this.maxX));
+    this.y = Math.max(-this.margin, Math.min(this.y, this.maxY));
   }
 }
 

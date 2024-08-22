@@ -31,30 +31,25 @@ export class GameMap {
     }
     initTiles() {
 
-        let pointsScale = 2;
-        let scoreAreaCol = this.cols / 2;
-        let scoreAreaRow = this.rows / 2;
-        let scoreAreaStart = this.tileSize / 2;
-        let points = 1;
+        const pointsScale = 2;
+        const scoreAreaCol = this.cols / 2;
+        const scoreAreaRow = this.rows / 2;
+        const scoreAreaSize = this.tileSize / 2;
 
-        let tile;
+        const colStart = scoreAreaCol - scoreAreaSize;
+        const colEnd = scoreAreaCol + scoreAreaSize;
+        const rowStart = scoreAreaRow - scoreAreaSize;
+        const rowEnd = scoreAreaRow + scoreAreaSize;
+
         for (let row = 0; row < this.rows; row++) {
             this.tiles[row] = [];
-
+    
             for (let col = 0; col < this.cols; col++) {
-                if ((col >= scoreAreaCol - scoreAreaStart && col <= scoreAreaCol + scoreAreaStart) &&
-                    row >= scoreAreaRow - scoreAreaStart && row <= scoreAreaRow + scoreAreaStart) {
-                    points = 1;
-                    points *= pointsScale;
-                }
+                let points = (col >= colStart && col <= colEnd && row >= rowStart && row <= rowEnd) ? 1 * pointsScale : 1;
 
-                tile = new Tile(col, row, 0, points, 32, '#111', false);
-
+                let  tile = new Tile(col, row, 0, points, this.tileSize, '#111', false);
                 this.tiles[row].push(tile);
-
             }
-
-
         }
     }
 

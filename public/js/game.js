@@ -15,6 +15,7 @@ export class Game {
         this.ctx.scale(this.devicePixelRatio || 1, this.devicePixelRatio || 1);
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight;
+     
 
         this.mode = mode;
         this.me = new Player({
@@ -40,14 +41,13 @@ export class Game {
         this.gameOver = false;
         this.abilities = [];
         this.bonuses = [];
-
+      
         window.addEventListener("resize", debounce(40, this.resizeCanvas.bind(this)));
         this.canvas.addEventListener("wheel", (event) => event.preventDefault());
 
-
-        this.animate();
-
-
+        this.lastTime = 0;
+        this.animateId = requestAnimationFrame(this.animate.bind(this));
+    
     }
     update(gameData) {
        
@@ -87,30 +87,20 @@ export class Game {
 
     }
     draw() {
+
         this.map.drawTiles();
         this.map.drawGrid();
         if (!this.me.dead) {
             this.me.draw();
         }
-        for (const id in this.players) {
-            const player = this.players[id]
-            player.draw();
-        }
-
-        for (const i in this.abilities) {
-            const ability = this.abilities[i];
-            ability.draw();
-        }
-
-        for (const i in this.bonuses) {
-            const bonus = this.bonuses[i];
-            bonus.draw();
-        }
+        Object.values(this.players).forEach(player => player.draw());
+        this.abilities.forEach(ability => ability.draw());
+        this.bonuses.forEach(bonus => bonus.draw());
         this.ui.draw();
+        
     }
     animate() {
-        this.animationId = requestAnimationFrame(this.animate.bind(this));
-
+    
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (!this.me.dead) {
             this.me.move();
@@ -121,6 +111,8 @@ export class Game {
         }
         this.camera.update();
         this.draw();
+
+        requestAnimationFrame(this.animate.bind(this));
     }
     stopAnimate() {
         this.inputHandler.stopCapturingInput();
@@ -169,18 +161,13 @@ export class Game {
 
         this.devicePixelRatio = window.devicePixelRatio || 1;
 
-        const originalWidth = this.canvas.width;
-        const originalHeight = this.canvas.height;
+        this.canvas.style.width = `${newWidth}px`;
+        this.canvas.style.height = `${newHeight}px`;
 
-        this.canvas.width = newWidth;
-        this.canvas.height = newHeight;
+        this.canvas.width = newWidth * this.devicePixelRatio;
+        this.canvas.height = newHeight * this.devicePixelRatio;
 
-        this.ctx.scale(devicePixelRatio, devicePixelRatio);
-
-
-        this.camera.setViewport(
-            (this.camera.viewportWidth / originalWidth) * newWidth,
-            (this.camera.viewportHeight / originalHeight) * newHeight
-        );
+        this.camera.setViewport(newWidth, newHeight);
+        this.camera.update();  
     }
 }

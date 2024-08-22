@@ -94,9 +94,9 @@ export class Player {
     const dt = (deltaTime / 1000);
     const moveAmount = this.speed * this.slowMultiplier * dt;
 
-    const dx = this.targetX - this.x;
-    const dy = this.targetY - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    let dx = this.targetX - this.x;
+    let dy = this.targetY - this.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance > 0) {
       const normalizedX = dx / distance;
@@ -104,6 +104,7 @@ export class Player {
 
       this.x += normalizedX * moveAmount;
       this.y += normalizedY * moveAmount;
+
     }
 
     if (Math.abs(dx) <= moveAmount && Math.abs(dy) <= moveAmount) {
@@ -176,6 +177,13 @@ export class Player {
 
     for (let [playerId, tiles] of lostTiles) {
       const player = this.game.players[playerId];
+      for (let tile of tiles) {
+        if (tile.x === player.x && tile.y === player.y) {
+
+            this.kills += 1;
+            this.addScore(100, this.killMultiplier);
+        }
+      }
       player.removeTilesFromTerritory(tiles);
     }
 
@@ -474,18 +482,21 @@ export class Player {
   
   initBase() {
     const spawn = Math.floor(SPAWN_SIZE * 0.5);
+    const map = this.game.map;
     for (let row = -spawn ; row <= spawn; row++) {
       for (let col = -spawn; col <= spawn; col++) {
         const newRow = this.y + row;
         const newCol = this.x + col;
 
-        const spawnLand = this.game.map.getTile(newRow, newCol);
+        const spawnLand = map.getTile(newRow, newCol);
         spawnLand.playerId = this.user.id;
         spawnLand.color = this.color;
-        this.lands.push(spawnLand);
-        this.game.map.updatedTiles.push(spawnLand);
-        this.game.map.occupiedSpawns.push(spawnLand);
-        if (this.team) {
+        if (!this.lands.includes(spawnLand)) { 
+          this.lands.push(spawnLand);
+        }
+        map.updatedTiles.push(spawnLand);
+        map.occupiedSpawns.push(spawnLand);
+        if (this.team && !this.team.lands.includes(spawnLand)) {
           this.team.lands.push(spawnLand);
         }
       }
