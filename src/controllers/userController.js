@@ -24,14 +24,12 @@ export  class UserController {
        if (this.user.room !== "rooms") {
            this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} opuścił grę.`, "info"));
        }
-    
-
     }
     sendMessage(message) {
         if (message.trim() === "" || !message || message.length > 255) return;
 
         this.socket.emit("message", formatMessage(this.user.name, message));
-        this.socket.to(this.user.room).emit("message", formatMessage(this.user.name, message));
+        this.socket.broadcast.to(this.user.room).emit("message", formatMessage(this.user.name, message));
     }
 
     updateGameForm(gameData, room) {
@@ -46,7 +44,6 @@ export  class UserController {
    
     disconnect() {
         this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} rozłączył się.`, "info"));
-    
     }
   
    

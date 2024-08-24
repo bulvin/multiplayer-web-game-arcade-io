@@ -23,8 +23,6 @@ const startGame = (gameMode, gameTime) => socket.emit('startGame', { gameMode, g
 const updateGameForm = (gameMode, gameTime) => socket.emit('gameFormUpdate', { gameMode, gameTime });
 
 
-
-
 socket.on("joinedOrCreated", () => {
   displayElement(elements.lobby, "flex");
   displayElement(elements.rooms, "none");
@@ -126,7 +124,6 @@ socket.on("gameOver", (scoreboard) => {
   const frontendGame = getGame();
   frontendGame.gameOver = true;
   frontendGame.ui.setEndGameScreen(scoreboard);
-
 })
 
 socket.on("backToLobby", () => {
@@ -141,6 +138,7 @@ socket.on("backToLobby", () => {
 
   if (!getGame()) {
     displayElement(elements.rooms, "grid");
+    elements.chatMessages.innerHTML= "";
   }
 }
 

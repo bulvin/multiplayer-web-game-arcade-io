@@ -4,7 +4,7 @@ export class GameController {
         this.game = game;
         this.roomController = roomController;
         this.playersControllers = playersControllers;
-        this.tickRate = 15; 
+        this.tickRate = 15;
         this.loop = null;
         this.executeTick();
     }

@@ -2,7 +2,8 @@ export class PlayerController {
     constructor(userController, player) {
         this.userController = userController;
         this.player = player;
-
+        
+        this.userController.socket.removeAllListeners('playerInput');
         this.userController.socket.on('playerInput', this.handleInput.bind(this));
     }
     handleInput(input) {

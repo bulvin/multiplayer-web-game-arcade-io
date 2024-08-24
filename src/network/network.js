@@ -13,8 +13,6 @@ import { generateUuid } from "../utils/generateUuid.js";
 import globalEmitter from "../utils/eventEmitter.js";
 import { formatMessage } from "../utils/formatMessage.js";
 
-
-
 export class Network {
   constructor(io) { 
     this.io = io;
@@ -25,16 +23,14 @@ export class Network {
 
     this.io.on("connection", (socket) => this.onConnection(socket));
     globalEmitter.on("removeGame", (gameId) => this.removeGame(gameId));
-
   }
   onConnection(socket) {
-    console.log(`Użytkownik połączył się o id ${socket.id}`);
+    this.clearListeners(socket);
     socket.on("join", (nickname) => {
       const joined = this.onJoin(socket, nickname);
-
       if (joined) {
+        this.clearListeners(socket, ["joinRoom", "createRoom"]);
         this.updateRooms();
-
         socket.on("joinRoom", (data) => {
           const joinedRoom = this.joinRoom(socket, data);
           if (joinedRoom) {
@@ -48,19 +44,18 @@ export class Network {
             this.updateRooms();
             this.registerGameEvents(socket);
           }
-        });
-      }
+        }); }
     });
     socket.on("disconnect", (reason) => this.disconnect(socket, reason));
   }
 
   registerGameEvents(socket) {
+    this.clearListeners(socket, ["receiveMessage", "startGame", "gameFormUpdate", "leaveRoom"]);
     socket.emit("joinedOrCreated");
     socket.on("receiveMessage", (data) => this.sendMessage(socket, data));
     socket.on("startGame", (gameData) => this.onStartGame(socket, gameData));
     socket.on("gameFormUpdate", (gameData) => this.onUpdateGameForm(socket, gameData));
     socket.on("leaveRoom", () => this.leaveRoom(socket));
-
   }
 
   onJoin(socket, nickname) {
@@ -348,6 +343,9 @@ export class Network {
       userController.updateGameForm(gameData, roomController.room);
     }
 
+  }
+  clearListeners(socket, events=[ "join", "joinRoom", "createRoom", "disconnect", "receiveMessage", "startGame", "gameFormUpdate", "leaveRoom"]) {
+    events.forEach(event => socket.removeAllListeners(event));
   }
 
 
