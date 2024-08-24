@@ -5,16 +5,17 @@ export class InputHandler {
         this.input = [];
         this.keydownHandler = (e) => {
             e.preventDefault();
-            const key = e.key.toLowerCase();
-            if (['w', 's', 'a', 'd', 'r', 't', 'e'].includes(key) && !this.input.includes(key)) {
+            const key = e.key;
+            const allowedKeys = ['w', 's', 'a', 'd', 'r', 't', 'e', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+        
+            if (allowedKeys.includes(key) && !this.input.includes(key)) {
 
                 this.input.push(key);
-
                 sendPlayerInput(this.input);
             }
         };
         this.keyupHandler = (e) => {
-            const key = e.key.toLowerCase();
+            const key = e.key;
             const index = this.input.findIndex(k => k === key);
             if (index > -1) {
                 this.input.splice(index, 1);

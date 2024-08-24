@@ -7,15 +7,23 @@ const Direction = Object.freeze({
 });
 
 const Keys = Object.freeze({
-    W: 'w',
-    S: 's',
-    A: 'a',
-    D: 'd',
-    R: 'r',
-    T: 't',
-    E: 'e',
+    W: 'W',
+    S: 'S',
+    A: 'A',
+    D: 'D',
+    R: 'R',
+    T: 'T',
+    E: 'E',
+    ArrowLeft: 'ARROWLEFT',
+    ArrowRight: 'ARROWRIGHT',
+    ArrowUp: 'ARROWUP',
+    ArrowDown: 'ARROWDOWN',
 });
+
+const MOVEMENT_KEYS = new Set([
+    Keys.W, Keys.S, Keys.A, Keys.D,
+    Keys.ArrowUp, Keys.ArrowDown, Keys.ArrowLeft, Keys.ArrowRight]);
 
 const SPAWN_SIZE = 3;
 
-export { Direction, Keys, SPAWN_SIZE };
+export { Direction, Keys, SPAWN_SIZE, MOVEMENT_KEYS };

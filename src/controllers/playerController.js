@@ -8,7 +8,7 @@ export class PlayerController {
     }
     handleInput(input) {
         if (input.length > 0) {
-            const newInput = input.map(key => key.toLowerCase());
+            const newInput = input.map(key => key.toUpperCase());
             this.player.setInput(newInput);
         }
 

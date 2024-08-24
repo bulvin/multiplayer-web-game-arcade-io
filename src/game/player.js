@@ -1,5 +1,5 @@
 import { addLostTile, startFillEnclosedArea } from "../utils/enclosedArea.js";
-import { Direction, Keys, SPAWN_SIZE } from "../constants/gameConfig.js";
+import { Direction, Keys, SPAWN_SIZE, MOVEMENT_KEYS } from "../constants/gameConfig.js";
 
 
 export class Player {
@@ -37,7 +37,6 @@ export class Player {
       minY: this.y - Math.floor(SPAWN_SIZE * 0.5),
       maxY: this.y + Math.floor(SPAWN_SIZE * 0.5)
     }
-
   }
 
   update(deltaTime) {
@@ -127,19 +126,15 @@ export class Player {
   }
 
   setInput(input) {
+    if (this.dead) return; 
+   
     const key = input.pop();
 
-    if (!this.dead) {
-      if ([Keys.W, Keys.S, Keys.A, Keys.D].includes(key) && !this.moveQueue.includes(key)) {
-
-        this.moveQueue.push(key);
-
-      } else if (key === Keys.E || key === Keys.R || key === Keys.T) {
-        this.useAbility(key);
-      }
+    if (MOVEMENT_KEYS.has(key) && !this.moveQueue.includes(key)) {
+      this.moveQueue.push(key);
+    }  else if (key === Keys.E || key === Keys.R || key === Keys.T) {
+      this.useAbility(key);
     }
-
-
   }
   handleDeadState(deltaTime) {
     if (this.deadTimer > this.deadInterval) {
@@ -546,4 +541,8 @@ const keyToDirection = {
   [Keys.S]: Direction.DOWN,
   [Keys.A]: Direction.LEFT,
   [Keys.D]: Direction.RIGHT,
+  [Keys.ArrowUp]: Direction.UP,
+  [Keys.ArrowDown]: Direction.DOWN,
+  [Keys.ArrowLeft]: Direction.LEFT,
+  [Keys.ArrowRight]: Direction.RIGHT
 };
