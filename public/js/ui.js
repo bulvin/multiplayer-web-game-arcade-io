@@ -187,7 +187,7 @@ export class UI {
        this.drawText('Umiejętności', x + 50, y - 5); 
     
         for (let i = 0; i < countAbilities; i++) {
-            const ability = this.game.me.abilities?.[keys[i].toLowerCase()];
+            const ability = this.game.me.abilities && this.game.me.abilities[keys[i].toUpperCase()];
             const rectWidth = this.game.map.tileSize * 2;
     
             this.setFillAndStroke('hsla(0, 0%, 0%, 0.5)', borderColor, borderWidth);
@@ -342,6 +342,7 @@ export class UI {
     }
 
     drawIconAbility(ability, x, y) {
+
         let circleColor;
         const radius = this.game.map.tileSize / 2;
 

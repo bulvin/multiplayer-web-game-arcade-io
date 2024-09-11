@@ -12,10 +12,9 @@ export class Game {
         this.canvas = document.getElementById("game-map");
         this.ctx = this.canvas.getContext('2d');
         this.devicePixelRatio = window.devicePixelRatio || 1;
-        this.ctx.scale(this.devicePixelRatio || 1, this.devicePixelRatio || 1);
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight;
-     
+        this.ctx.scale(this.devicePixelRatio || 1, this.devicePixelRatio || 1);
 
         this.mode = mode;
         this.me = new Player({

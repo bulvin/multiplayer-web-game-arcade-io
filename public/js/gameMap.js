@@ -6,20 +6,24 @@ export class GameMap {
         this.tileSize = 32;
         this.width = this.rows * this.tileSize;
         this.height = this.cols * this.tileSize;
-      
-
+        
         this.tiles = Array(this.rows * this.cols).fill({ color: '#111' });
         this.update(map);
+        
+        // Pre-calculate grid lines
+        this.gridPath = new Path2D();
+        this._precalculateGridPath();
     }
+
     update(tiles) {
         for (let tile of tiles) {
             let index = tile.y * this.cols + tile.x;
             this.tiles[index] = tile;
         }
-
     }
+
     drawTiles() {
-        
+        const ctx = this.game.ctx;
         const cameraX = this.game.camera.x;
         const cameraY = this.game.camera.y;
         const viewportWidth = this.game.canvas.width;
@@ -29,89 +33,60 @@ export class GameMap {
         const startY = Math.max(0, Math.floor(cameraY / this.tileSize));
         const endX = Math.min(this.cols, Math.ceil((cameraX + viewportWidth) / this.tileSize));
         const endY = Math.min(this.rows, Math.ceil((cameraY + viewportHeight) / this.tileSize));
+
+        ctx.save();
+        ctx.translate(-cameraX, -cameraY);
 
         for (let row = startY; row < endY; row++) {
             for (let col = startX; col < endX; col++) {
                 let index = row * this.cols + col;
                 let tile = this.tiles[index];
 
-                const x = col * this.tileSize - cameraX;
-                const y = row * this.tileSize - cameraY;
-                this.game.ctx.fillStyle = tile.color;
-                this.game.ctx.fillRect(x, y, this.tileSize , this.tileSize);
+                ctx.fillStyle = tile.color;
+                ctx.fillRect(col * this.tileSize, row * this.tileSize, this.tileSize, this.tileSize);
             }
         }
-    }
 
+        ctx.restore();
+    }
 
     drawGrid() {
-        this.game.ctx.save();
-        this.game.ctx.beginPath();
-
-        const cameraX = this.game.camera.x;
-        const cameraY = this.game.camera.y;
-        const viewportWidth = this.game.canvas.width;
-        const viewportHeight = this.game.canvas.height;
-
-        const startX = Math.max(0, Math.floor(cameraX / this.tileSize));
-        const startY = Math.max(0, Math.floor(cameraY / this.tileSize));
-        const endX = Math.min(this.cols, Math.ceil((cameraX + viewportWidth) / this.tileSize));
-        const endY = Math.min(this.rows, Math.ceil((cameraY + viewportHeight) / this.tileSize));
-
-        const mapStartX = startX * this.tileSize - cameraX ;
-        const mapStartY = startY * this.tileSize - cameraY ;
-        const mapEndX = endX * this.tileSize - cameraX;
-        const mapEndY = endY * this.tileSize  - cameraY;
-
-        for (let i = startX; i < endX; i++) {
-            const x = i * this.tileSize - cameraX;
-
-            if (x >= mapStartX && x <= mapEndX) {
-                this.game.ctx.moveTo(x, mapStartY);
-                this.game.ctx.lineTo(x, mapEndY);
-            }
-        }
-
-        for (let i = startY; i < endY; i++) {
-            const y = i * this.tileSize - cameraY;
-            if (y >= mapStartY && y <= mapEndY) {
-                this.game.ctx.moveTo(mapStartX, y);
-                this.game.ctx.lineTo(mapEndX, y);
-            }
-        }
-
-        this.game.ctx.lineWidth = 2;
-
-        this.game.ctx.strokeStyle = '#191919';
-        this.game.ctx.stroke();
-
+        const ctx = this.game.ctx;
+        ctx.save();
+        ctx.translate(-this.game.camera.x, -this.game.camera.y);
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#191919';
+        ctx.stroke(this.gridPath);
 
         this._drawBorderMap();
-        this.game.ctx.restore();
-
+        ctx.restore();
     }
-  
+
+    _precalculateGridPath() {
+        for (let i = 0; i <= this.cols; i++) {
+            const x = i * this.tileSize;
+            this.gridPath.moveTo(x, 0);
+            this.gridPath.lineTo(x, this.height);
+        }
+
+        for (let i = 0; i <= this.rows; i++) {
+            const y = i * this.tileSize;
+            this.gridPath.moveTo(0, y);
+            this.gridPath.lineTo(this.width, y);
+        }
+    }
 
     _drawBorderMap() {
-        this.game.ctx.beginPath();
+        const ctx = this.game.ctx;
+        ctx.beginPath();
     
         const lineWidth = 15;
-        const startX = 0 - this.game.camera.x;
-        const startY = 0 - this.game.camera.y;
-        const endX = this.cols * this.tileSize - this.game.camera.x
-        const endY = this.rows * this.tileSize - this.game.camera.y
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = 'darkred';
+        ctx.lineCap = 'round';
     
-        this.game.ctx.moveTo(startX, startY);
-        this.game.ctx.lineTo(endX, startY);
-        this.game.ctx.lineTo(endX, endY);
-        this.game.ctx.lineTo(startX, endY);
-        this.game.ctx.closePath();
-    
-        this.game.ctx.lineWidth = lineWidth;
-        this.game.ctx.strokeStyle = 'darkred';
-        this.game.ctx.lineCap = 'round';
-    
-        this.game.ctx.stroke();
+        ctx.rect(0, 0, this.width, this.height);
+        ctx.stroke();
     }
-
-    }
+}

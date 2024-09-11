@@ -7,19 +7,12 @@ import io from 'socket.io-client';
 import { throttle } from "throttle-debounce";
 
 const socket = io(`${window.location.host}`, { transports: ["websocket"] });
-
 const enterNickname = (nickname) => socket.emit("join", nickname);
-
 const sendPlayerInput = (input) => throttle(socket.emit("playerInput", input), 15);
-
 const createRoom = (name, maxPlayers) =>  socket.emit("createRoom", { name: name, maxPlayers: maxPlayers,});
-
 const joinRoom = (room) => socket.emit("joinRoom", room);
-
 const sendMessage = (message) => socket.emit('receiveMessage', message);
-
 const startGame = (gameMode, gameTime) => socket.emit('startGame', { gameMode, gameTime });
-
 const updateGameForm = (gameMode, gameTime) => socket.emit('gameFormUpdate', { gameMode, gameTime });
 
 

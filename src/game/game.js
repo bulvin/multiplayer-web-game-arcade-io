@@ -8,7 +8,7 @@ export class Game {
         this.map = gameMap;
         this.gameTimer = gameTimer;
         this.gameOver = false;
-        this.abilitySpawnInterval = 30 * 1000;
+        this.abilitySpawnInterval = 1 * 1000;
         this.lastAbilitySpawnTimer = 0;
         this.bonusSpawnInterval = 30 * 1000;
         this.lastBonusSpawnTimer = 0;
