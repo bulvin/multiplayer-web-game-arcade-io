@@ -132,13 +132,7 @@ export class Game {
                 territoryPercentage: territoryPercentage,
             });
         }
-        leaderboard.sort((a, b) => {
-            if (b.score === a.score) {
-                return b.territoryPercentage - a.territoryPercentage;
-            }
-            return b.score - a.score;
-        });
-        return leaderboard;
+       return this.sortLeaderBoard(leaderboard);
     }
     getTeamLeaderboard() {
         const leaderboard = this.teams.map(team => ({
@@ -147,14 +141,7 @@ export class Game {
             territoryPercentage: team.getTerritoryPercentage(this.map),
         }));
 
-        leaderboard.sort((a, b) => {
-            if (b.score === a.score) {
-                return b.territoryPercentage - a.territoryPercentage;
-            }
-            return b.score - a.score;
-        });
-
-        return leaderboard;
+        return this.sortLeaderBoard(leaderboard);
     }
     deadMessage(deadInterval, deadTime) {
 
@@ -194,11 +181,20 @@ export class Game {
                 team: player.team ? player.team.name : ''
             });
         }
+        
+        return this.sortLeaderBoard(leaderboard);
+    }
+    sortLeaderBoard(leaderboard) {
         leaderboard.sort((a, b) => {
-            if (b.score === a.score) {
+            if (a.score !== b.score) {
+                return b.score - a.score;
+            } else if (a.territoryPercentage !== b.territoryPercentage) {
                 return b.territoryPercentage - a.territoryPercentage;
+            } else if  (a.kills !== b.kills) {
+                return b.kills - a.kills;
+            } else {
+                return a.deaths - b.deaths;
             }
-            return b.score - a.score;
         });
         return leaderboard;
     }

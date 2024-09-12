@@ -43,11 +43,11 @@ export class GameMap {
 
         for (let row = 0; row < this.rows; row++) {
             this.tiles[row] = [];
-    
+
             for (let col = 0; col < this.cols; col++) {
                 let points = (col >= colStart && col <= colEnd && row >= rowStart && row <= rowEnd) ? 1 * pointsScale : 1;
 
-                let  tile = new Tile(col, row, 0, points, this.tileSize, '#111', false);
+                let tile = new Tile(col, row, 0, points, this.tileSize, '#111', false);
                 this.tiles[row].push(tile);
             }
         }
@@ -159,7 +159,6 @@ export class Tile {
             x: this.x,
             y: this.y,
             color: this.color,
-
         }
     }
 }

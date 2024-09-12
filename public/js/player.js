@@ -20,7 +20,7 @@ export class Player {
         this.game.ctx.save();
       
         this.game.ctx.shadowColor = this.color;
-        this.game.ctx.shadowBlur = 20;
+        this.game.ctx.shadowBlur = 25;
         this.game.ctx.fillStyle = this.color;
         this.game.ctx.strokeStyle = "white";
         this.game.ctx.lineWidth = 4;
@@ -43,7 +43,8 @@ export class Player {
         this.abilities = backendPlayer.abilities
         this.activeBonus = backendPlayer.activeBonus;
         this.game.map.tileSize = backendPlayer.tileSize;
-
+        this.game.map.width = backendPlayer.tileSize * this.game.map.cols;
+        this.game.map.height = backendPlayer.tileSize * this.game.map.rows;
     }
     updatePosition(targetX, targetY) {
         this.target.x = targetX;

@@ -6,11 +6,10 @@ export class GameMap {
         this.tileSize = 32;
         this.width = this.rows * this.tileSize;
         this.height = this.cols * this.tileSize;
-        
+
         this.tiles = Array(this.rows * this.cols).fill({ color: '#111' });
         this.update(map);
-        
-        // Pre-calculate grid lines
+
         this.gridPath = new Path2D();
         this._precalculateGridPath();
     }
@@ -34,9 +33,6 @@ export class GameMap {
         const endX = Math.min(this.cols, Math.ceil((cameraX + viewportWidth) / this.tileSize));
         const endY = Math.min(this.rows, Math.ceil((cameraY + viewportHeight) / this.tileSize));
 
-        ctx.save();
-        ctx.translate(-cameraX, -cameraY);
-
         for (let row = startY; row < endY; row++) {
             for (let col = startX; col < endX; col++) {
                 let index = row * this.cols + col;
@@ -46,21 +42,16 @@ export class GameMap {
                 ctx.fillRect(col * this.tileSize, row * this.tileSize, this.tileSize, this.tileSize);
             }
         }
-
-        ctx.restore();
     }
 
     drawGrid() {
         const ctx = this.game.ctx;
-        ctx.save();
-        ctx.translate(-this.game.camera.x, -this.game.camera.y);
-        
+
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#191919';
         ctx.stroke(this.gridPath);
 
         this._drawBorderMap();
-        ctx.restore();
     }
 
     _precalculateGridPath() {
@@ -80,12 +71,12 @@ export class GameMap {
     _drawBorderMap() {
         const ctx = this.game.ctx;
         ctx.beginPath();
-    
+
         const lineWidth = 15;
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = 'darkred';
         ctx.lineCap = 'round';
-    
+
         ctx.rect(0, 0, this.width, this.height);
         ctx.stroke();
     }

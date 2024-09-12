@@ -1,7 +1,7 @@
-import {  getGame } from "./gameManager.js";
+import { getGame } from "./gameManager.js";
 import { displayElement, generateRooms, showError, updatePlayersInRoom } from "./index.js";
 import { elements } from "./index.js";
-import { createGame, deleteGame} from "./gameManager.js";
+import { createGame, deleteGame } from "./gameManager.js";
 
 import io from 'socket.io-client';
 import { throttle } from "throttle-debounce";
@@ -9,7 +9,7 @@ import { throttle } from "throttle-debounce";
 const socket = io(`${window.location.host}`, { transports: ["websocket"] });
 const enterNickname = (nickname) => socket.emit("join", nickname);
 const sendPlayerInput = (input) => throttle(socket.emit("playerInput", input), 15);
-const createRoom = (name, maxPlayers) =>  socket.emit("createRoom", { name: name, maxPlayers: maxPlayers,});
+const createRoom = (name, maxPlayers) => socket.emit("createRoom", { name: name, maxPlayers: maxPlayers, });
 const joinRoom = (room) => socket.emit("joinRoom", room);
 const sendMessage = (message) => socket.emit('receiveMessage', message);
 const startGame = (gameMode, gameTime) => socket.emit('startGame', { gameMode, gameTime });
@@ -26,7 +26,7 @@ socket.on("error", (errorMessage) => showError(errorMessage));
 
 socket.on("updateGame", (backendGame) => {
   const frontendGame = getGame();
-  
+
   if (frontendGame) {
     frontendGame.update(backendGame);
   }
@@ -41,13 +41,13 @@ socket.on("updateGame", (backendGame) => {
       players: backendGame.players,
       leaderBoard: backendGame.leaderBoard,
     };
-    
+
     const newGameView = createGame(gameData);
 
     displayElement(elements.lobby, "none")
     displayElement(elements.canvas, "block");
   }
- 
+
 
 });
 
@@ -56,7 +56,7 @@ socket.on("updateGame", (backendGame) => {
 socket.on("deadMessage", (data) => {
   const frontendGame = getGame();
   frontendGame.ui.setMessages(data.messages);
-  
+
 });
 
 socket.on("updateRooms", (rooms) => {
@@ -126,12 +126,12 @@ socket.on("backToLobby", () => {
 });
 
 
- const leaveRoom = () => {
+const leaveRoom = () => {
   socket.emit('leaveRoom');
 
   if (!getGame()) {
     displayElement(elements.rooms, "grid");
-    elements.chatMessages.innerHTML= "";
+    elements.chatMessages.innerHTML = "";
   }
 }
 

@@ -12,7 +12,7 @@ export class Game {
         this.canvas = document.getElementById("game-map");
         this.ctx = this.canvas.getContext('2d');
         this.devicePixelRatio = window.devicePixelRatio || 1;
-        this.canvas.width = window.innerWidth
+        this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.ctx.scale(this.devicePixelRatio || 1, this.devicePixelRatio || 1);
 
@@ -40,16 +40,16 @@ export class Game {
         this.gameOver = false;
         this.abilities = [];
         this.bonuses = [];
-      
+
         window.addEventListener("resize", debounce(40, this.resizeCanvas.bind(this)));
         this.canvas.addEventListener("wheel", (event) => event.preventDefault());
 
         this.lastTime = 0;
         this.animateId = requestAnimationFrame(this.animate.bind(this));
-    
+
     }
     update(gameData) {
-       
+
         this.gameTimer = gameData.gameTimer;
         this.map.update(gameData.map);
         this.me.update(gameData.me);
@@ -87,8 +87,14 @@ export class Game {
     }
     draw() {
 
+        this.ctx.save();
+        this.ctx.translate(-this.camera.x, -this.camera.y);
+
         this.map.drawTiles();
         this.map.drawGrid();
+
+        this.ctx.restore();
+
         if (!this.me.dead) {
             this.me.draw();
         }
@@ -96,10 +102,10 @@ export class Game {
         this.abilities.forEach(ability => ability.draw());
         this.bonuses.forEach(bonus => bonus.draw());
         this.ui.draw();
-        
+
     }
     animate() {
-    
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (!this.me.dead) {
             this.me.move();
@@ -166,7 +172,7 @@ export class Game {
         this.canvas.width = newWidth * this.devicePixelRatio;
         this.canvas.height = newHeight * this.devicePixelRatio;
 
-        this.camera.setViewport(newWidth, newHeight);
-        this.camera.update();  
+        this.camera.setViewport(this.canvas.width, this.canvas.height, newHeight);
+        this.camera.update();
     }
 }

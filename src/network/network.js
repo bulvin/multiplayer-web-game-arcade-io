@@ -14,7 +14,7 @@ import globalEmitter from "../utils/eventEmitter.js";
 import { formatMessage } from "../utils/formatMessage.js";
 
 export class Network {
-  constructor(io) { 
+  constructor(io) {
     this.io = io;
     this.userControllers = new Map();
     this.roomControllers = new Map();
@@ -44,7 +44,8 @@ export class Network {
             this.updateRooms();
             this.registerGameEvents(socket);
           }
-        }); }
+        });
+      }
     });
     socket.on("disconnect", (reason) => this.disconnect(socket, reason));
   }
@@ -238,7 +239,7 @@ export class Network {
     if (userController) {
       userController.leaveCurrRoom();
       let playerName = userController.user.name;
-    
+
       userController.user.name = roomController.getUniqueName(playerName);
       userController.joinRoom(room.id);
       roomController.addUser(userController.user);
@@ -338,13 +339,13 @@ export class Network {
 
   onUpdateGameForm(socket, gameData) {
     const userController = this.userControllers.get(socket.id);
-    const roomController = this.roomControllers.get(userController.user.room );
+    const roomController = this.roomControllers.get(userController.user.room);
     if (userController) {
       userController.updateGameForm(gameData, roomController.room);
     }
 
   }
-  clearListeners(socket, events=[ "join", "joinRoom", "createRoom", "disconnect", "receiveMessage", "startGame", "gameFormUpdate", "leaveRoom"]) {
+  clearListeners(socket, events = ["join", "joinRoom", "createRoom", "disconnect", "receiveMessage", "startGame", "gameFormUpdate", "leaveRoom"]) {
     events.forEach(event => socket.removeAllListeners(event));
   }
 

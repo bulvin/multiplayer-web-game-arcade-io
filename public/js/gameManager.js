@@ -19,7 +19,7 @@ export function getGame() {
 }
 
 export function deleteGame() {
-    if(game) {
+    if (game) {
         game.stopAnimate();
         game = null;
     }

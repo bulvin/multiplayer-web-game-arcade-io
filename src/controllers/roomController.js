@@ -51,7 +51,4 @@ export class RoomController {
         }
         return newName;
     }
-    
-
-
 }

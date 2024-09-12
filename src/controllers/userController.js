@@ -1,7 +1,7 @@
 import { formatMessage } from "../utils/formatMessage.js";
-import { isValidToStartGame} from "../utils/valid.js";
+import { isValidToStartGame } from "../utils/valid.js";
 
-export  class UserController {
+export class UserController {
     constructor(socket, user) {
         this.socket = socket;
         this.user = user;
@@ -14,16 +14,16 @@ export  class UserController {
             this.socket.to(room).emit(
                 "message",
                 formatMessage("SERWER", `${this.user.name} dołączył do gry`, "info")
-              );
+            );
         }
-       
+
     }
-    
+
     leaveCurrRoom() {
-       this.socket.leave(this.user.room);
-       if (this.user.room !== "rooms") {
-           this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} opuścił grę.`, "info"));
-       }
+        this.socket.leave(this.user.room);
+        if (this.user.room !== "rooms") {
+            this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} opuścił grę.`, "info"));
+        }
     }
     sendMessage(message) {
         if (message.trim() === "" || !message || message.length > 255) return;
@@ -33,20 +33,20 @@ export  class UserController {
     }
 
     updateGameForm(gameData, room) {
-        
+
         const GameDataFormValidation = isValidToStartGame(gameData, room);
         if (GameDataFormValidation.error) {
             return;
-        } 
+        }
         this.socket.to(this.user.room).emit("updateGameForm", gameData);
-    
+
     }
-   
+
     disconnect() {
         this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} rozłączył się.`, "info"));
     }
-  
-   
+
+
 
 
 }
