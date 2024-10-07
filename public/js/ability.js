@@ -14,13 +14,13 @@ export class Ability {
         const y = this.position.y - this.game.camera.y + this.game.map.tileSize / 2 + animationOffset;
         let circleColor;
 
-        if (this.name === "PRĘDKOŚĆ") {
+        if (this.name === "SPEED") {
             circleColor = "#1E90FF";
-        } else if (this.name === "SPOWOLNIENIE") {
+        } else if (this.name === "SLOW") {
             circleColor = "#FF4500";
-        } else if (this.name === "ODPORNOŚĆ") {
+        } else if (this.name === "IMMUNITY") {
             circleColor = "#32CD32";
-        } else if (this.name === "WIDOCZNOŚĆ") {
+        } else if (this.name === "VISION") {
             circleColor = "#FFFF00";
         } else if (this.name === "TELEPORT") {
             circleColor = "#800080";
