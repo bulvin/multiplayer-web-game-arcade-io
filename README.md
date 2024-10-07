@@ -1,5 +1,5 @@
 # Multiplayer Web Game Arcade 2D 
- https://multiplayer-web-game-arcade-io.onrender.com/
+ https://multiplayer-web-game-arcade-io.onrender.com/ - test machine, propably u have to wait 20-30 sec. at first launch
 
 The gameplay consists of controlling a character (a square) and capturing territory (fields on a two-dimensional board). The territory is captured by tracing a path. The path is created by moving outside of the player's current territory. The territory is occupied (colored with the player's color) when the path forms a closed shape. Players can temporarily eliminate opponents by entering their created path, while entering one's own path results in self-elimination. The goal of the game is to have the largest number of points when the game time expires.
 
