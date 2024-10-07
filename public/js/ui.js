@@ -9,22 +9,16 @@ export class UI {
         this.scoreboardY = 20;
         this.scoreboardWidth = 400;
         this.verticalSpacing = this.fontSize * 0.5;
-
         this.titleSpacing = this.fontSize * 0.8;
-
         this.formattedTimer = '';
         this.rectY = 0;
         this.leaderBoard = [];
-
     }
 
     draw() {
-
         if (this.game.gameOver) {
             this.gameOver();
-        }
-        else {
-
+        } else {
             this.updateTimer();
             this.drawScoreBoard();
             this.drawStats();
@@ -35,10 +29,8 @@ export class UI {
                 if (!this.game.me.dead) {
                     this.messages = [];
                 }
-
             }
         }
-
     }
 
     updateTimer() {
@@ -53,7 +45,7 @@ export class UI {
 
         const x = this.game.canvas.width * 0.5;
         const y = this.game.map.tileSize * 3;
-        const formattedTimerText = (this.game.gameTimer > 0) ? `Czas: ${this.formattedTimer}` : '';
+        const formattedTimerText = (this.game.gameTimer > 0) ? `Time: ${this.formattedTimer}` : '';
         this.drawText(formattedTimerText, x, y, 'center');
     }
     drawScoreBoard() {
@@ -65,7 +57,7 @@ export class UI {
         const padding = 10;
         const topMargin = 20;
 
-        const headers = ['#', this.game.mode === 'team' ? 'Drużyna' : 'Gracz', 'Punkty', 'Teren'];
+        const headers = ['#', this.game.mode === 'team' ? 'Team' : 'Player', 'Points', 'Territory'];
         const columnWidths = this.calculateColumnWidths(headers, leaderBoard);
 
         const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0) + padding * 2;
@@ -140,15 +132,14 @@ export class UI {
         this.setFillAndFont(this.color, `${this.fontSize + 10}px ${this.fontFamily}`);
         this.drawText(mess, this.game.canvas.width * 0.5, this.rectY + this.fontSize + lineHeight, 'center');
         this.drawText(mess1, this.game.canvas.width * 0.5, this.rectY + this.fontSize + 2.6 * lineHeight, 'center');
-
     }
 
     drawStats() {
         const texts = [
-            `Wyeliminowałeś: ${this.game.me.kills}`,
-            `Odpadłeś: ${this.game.me.deaths}`,
-            `Punkty: ${this.game.me.score}`,
-            `Zajęty teren: ${this.game.me.territory}%`
+            `Eliminated: ${this.game.me.kills}`,
+            `Died: ${this.game.me.deaths}`,
+            `Points: ${this.game.me.score}`,
+            `Territory: ${this.game.me.territory}%`
         ];
 
         const lineHeight = this.fontSize + 5;
@@ -180,7 +171,7 @@ export class UI {
 
 
         this.setFillAndFont('white', `bold ${this.fontSize - 10}px ${this.fontFamily}`);
-        this.drawText('Umiejętności', x + 50, y - 5);
+        this.drawText('Abilities', x + 50, y - 5);
 
         for (let i = 0; i < countAbilities; i++) {
             const ability = this.game.me.abilities && this.game.me.abilities[keys[i].toUpperCase()];
@@ -267,8 +258,8 @@ export class UI {
         this.game.ctx.textAlign = align;
         this.game.ctx.fillText(text, x, y);
     }
-    gameOver() {
 
+    gameOver() {
         this.game.ctx.save();
         this.game.ctx.font = `${this.fontSize + 10}px ${this.fontFamily}`;
         this.game.ctx.fillStyle = this.color;
@@ -279,22 +270,23 @@ export class UI {
         this.game.ctx.fillRect(0, 0, this.game.canvas.width, this.game.canvas.height);
         this.game.ctx.restore();
         this.game.ctx.textAlign = 'center';
-        let message = 'Gra Skończona - Tabela Wyników';
+        let message = 'Game Over - Scoreboard';
         this.game.ctx.fillText(message, this.game.canvas.width * 0.5, this.game.canvas.height * 0.3 - lineHeight);
-
+    
         for (let i = 0; i < this.leaderBoard.length; i++) {
             const player = this.leaderBoard[i];
             let playerStats = `${i + 1}. ${player.name}`;
             if (this.game.mode === 'team') {
-                playerStats += ` - Drużyna: ${player.team}`;
+                playerStats += ` - Team: ${player.team}`;
             }
-
-            playerStats += ` - Wyeliminował: ${player.kills}, Odpadł: ${player.deaths}, Punkty: ${player.score}, Teren: ${player.territory}%`;
+    
+            playerStats += ` - Eliminated: ${player.kills}, Died: ${player.deaths}, Points: ${player.score}, Territory: ${player.territory}%`;
             this.game.ctx.fillText(playerStats, this.game.canvas.width * 0.5, this.game.canvas.height * 0.3 + (i + 1) * lineHeight);
         }
-
+    
         this.game.ctx.restore();
     }
+    
     setEndGameScreen(scoreboard) {
         this.leaderBoard = scoreboard;
     }
@@ -342,13 +334,13 @@ export class UI {
         let circleColor;
         const radius = this.game.map.tileSize / 2;
 
-        if (ability === "PRĘDKOŚĆ") {
+        if (ability === "SPEED") {
             circleColor = "#1E90FF"; // blue
-        } else if (ability === "SPOWOLNIENIE") {
+        } else if (ability === "SLOW") {
             circleColor = "#FF4500";  // orange
-        } else if (ability === "ODPORNOŚĆ") {
+        } else if (ability === "IMMUNITY") {
             circleColor = "#32CD32"; // lime
-        } else if (ability === "WIDOCZNOŚĆ") {
+        } else if (ability === "VISION") {
             circleColor = "#FFFF00"; // yellow
         } else if (ability === "TELEPORT") {
             circleColor = "#800080"; // purpl
@@ -358,7 +350,5 @@ export class UI {
         this.game.ctx.arc(x, y, radius, 0, 2 * Math.PI);
         this.game.ctx.fill();
         this.game.ctx.closePath();
-
     }
-
 }

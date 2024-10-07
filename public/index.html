@@ -17,48 +17,42 @@
 <body>
   <div id="centered-content">
     <form id="nickname-section">
-      <input type="text" id="nickname" placeholder="Wprowadź swój pseudonim"  autocomplete="off" autofocus="on">
+      <input type="text" id="nickname" placeholder="Enter nickname..." autocomplete="off" required />
       <button id="send-nickname" type="submit">Ok</button>
-
     </form>
 
     <div id="rooms" style="display: none;">
-      <p id="title-rooms">Lista pokoi gry</p>
+      <p id="title-rooms">Game Rooms List</p>
       <table id="rooms-table">
         <thead id="rooms-header">
-          <th>Nazwa pokoju</th>
-          <th>Gracze</th>
-          <th><button id="create-room" class="join-button">+ Stwórz pokój</button></th>
+          <th>Room Name</th>
+          <th>Players</th>
+          <th><button id="create-room" class="join-button">+ Create Room</button></th>
         </thead>
         <tbody id="roomList"></tbody>
       </table>
     </div>
 
-
-
-
     <main id="lobby" style="display: none;">
       <section class="section-game-info">
         <div class="game-info-container">
-          <h2 class="subheading">
-            Informacje o grze
-          </h2>
-          <h3 id="room-info">Pokój: </h3>
-          <h3>Gracze:</h3>
+          <h2 class="subheading">Game Information</h2>
+          <h3 id="room-info">Room:</h3>
+          <h3>Players:</h3>
           <ul id="players-list"> </ul>
         </div>
-        <button id="leave-room-button">Opuść pokój</button>
+        <button id="leave-room-button">Leave Room</button>
       </section>
 
       <section class="section-game">
-        <h2 class="subheading">Wybór trybu gry</h2>
+        <h2 class="subheading">Game Mode Selection</h2>
       
         <form class="game-form">
           <select id="type-game" class="type-game-select">
             <option value="standard">Standard</option>
-            <option value="team">Drużynowy</option>
+            <option value="team">Team</option>
           </select>
-          <label for="game-timer" class="game-timer-label">Czas gry:</label>
+          <label for="game-timer" class="game-timer-label">Game Time:</label>
           <input id="game-timer" type="number" min="2" max="10" value="2" class="game-timer-input">
         </form>
         <button class="btn start-btn">START</button>
@@ -70,19 +64,15 @@
 
         </div>
         <form class="chat-form">
-          <input id="message" class="form-input chat-message" name="message" placeholder="Napisz wiadomość..." autocomplete="off"
+          <input id="message" class="form-input chat-message" name="message" placeholder="Write message..." autocomplete="off"
             required />
-          <input class="btn chat-submit-btn" type="submit" value="Wyślij" />
+          <input class="btn chat-submit-btn" type="submit" value="Send" />
         </form>
       </section>
     </main>
 
-    <canvas id="game-map" style="display: none;">
-
-    </canvas>
+    <canvas id="game-map" style="display: none;"></canvas>
   </div>
-
-
 </body>
 
 </html>

@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === 'development') {
 const port = process.env.PORT || 8080;
 
 server.listen(port, () => {
-  console.log(`Serwer działa na porcie: ${port}`);
+  console.log(`SERVER LISTENING ON PORT ${port}`);
 });
 
 const network = new Network(io);

@@ -40,7 +40,7 @@ class Ability {
 
 class SpeedAbility extends Ability {
     constructor(x, y){
-        super(x, y, "PRĘDKOŚĆ", 5000);
+        super(x, y, "SPEED", 5000);
         
     }
     use(player) {
@@ -62,7 +62,7 @@ class SpeedAbility extends Ability {
 
 class SlowAbility extends Ability {
     constructor(x, y){
-        super(x, y, "SPOWOLNIENIE", 5000);
+        super(x, y, "SLOW", 5000);
     }
 
     use(player) {
@@ -96,7 +96,7 @@ class SlowAbility extends Ability {
 
 class SelfImmunityAbility extends Ability {
     constructor(x, y){
-        super(x, y, "ODPORNOŚĆ", 5000);
+        super(x, y, "IMMUNITY", 5000);
     }
 
     use(player) {
@@ -118,7 +118,7 @@ class SelfImmunityAbility extends Ability {
 
 class EnhancedVisionAbility extends Ability {
     constructor(x, y){
-        super(x, y, "WIDOCZNOŚĆ", 3000);
+        super(x, y, "VISION", 3000);
     }
 
     use(player) {

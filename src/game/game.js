@@ -43,8 +43,8 @@ export class Game {
                 if (player.getCountTiles() === this.map.countTiles() || player.team?.lands.length === this.map.countTiles()) {
                     this.gameOver = true;
                     return;
-                } 
-                
+                }
+
             }
         } else {
             this.gameOver = true;
@@ -52,48 +52,49 @@ export class Game {
     }
     spawnAbility() {
         const allAbilities = [SpeedAbility, SlowAbility, SelfImmunityAbility, EnhancedVisionAbility, TeleportAbility];
-    
-        for (let i= 0; i < 5; i++) { 
-    
+
+        for (let i= 0; i < 5; i++) {
+
             if (this.abilities.length >= 20) {
                 return;
             }
-    
+
             const Ability = allAbilities[Math.floor(Math.random() * allAbilities.length)];
             let x, y;
-    
+
             do {
                 x = Math.floor(Math.random() * this.map.cols);
                 y = Math.floor(Math.random() * this.map.rows);
             } while (this.isOccupied(x, y));
-    
+
             const newAbility = new Ability(x, y);
             this.abilities.push(newAbility);
         }
     }
-    
+
     spawnBonus() {
         const bonuses = ['SCORE_X2', 'SCORE_X4', 'SCORE_X8', 'KILL_X2'];
-    
+
         for (let i = 0; i < 5; i++) {
             if (this.bonuses.length >= 20) {
                 return;
             }
-    
+
             const randomIndex = Math.floor(Math.random() * bonuses.length);
             const randomName = bonuses[randomIndex];
             let x, y;
-    
+
             do {
                 x = Math.floor(Math.random() * this.map.cols);
                 y = Math.floor(Math.random() * this.map.rows);
             } while (this.isOccupied(x, y));
-    
+
             const duration = Math.floor(Math.random() * 5) + 10;
             const bonus = new Bonus(x, y, randomName, duration * 1000);
             this.bonuses.push(bonus);
         }
     }
+    
     addPlayer(player) {
 
         this.players[player.user.id] = player;
@@ -121,7 +122,7 @@ export class Game {
     }
     getLeaderboard() {
         const leaderboard = [];
-    
+
         for (const id in this.players) {
             const player = this.players[id];
             const score = player.score;
@@ -144,11 +145,10 @@ export class Game {
         return this.sortLeaderBoard(leaderboard);
     }
     deadMessage(deadInterval, deadTime) {
-
-        let messageDead = 'Wyelimowano cię!';
+        let messageDead = 'You have been eliminated!';
         let time = (deadInterval * 0.001) - (deadTime * 0.001);
-        let messageTime = `Powrócisz na planszę za: ${Math.ceil(time)}`;
-
+        let messageTime = `You will return to the board in: ${Math.ceil(time)}`;
+        
         return [messageDead, messageTime];
     }
     isOccupied(x, y) {
@@ -157,13 +157,13 @@ export class Game {
                 return true;
             }
         }
-    
+
         for (let bonus of this.bonuses) {
             if (bonus.x === x && bonus.y === y) {
                 return true;
             }
         }
-    
+
         return false;
     }
     getEndLeaderboard() {
@@ -181,7 +181,7 @@ export class Game {
                 team: player.team ? player.team.name : ''
             });
         }
-        
+
         return this.sortLeaderBoard(leaderboard);
     }
     sortLeaderBoard(leaderboard) {
@@ -222,7 +222,7 @@ export class Game {
             players: backendPlayers,
             leaderBoard: this.mode !== 'team' ? this.getLeaderboard() : this.getTeamLeaderboard(),
         };
-      
+
         return currentState;
     }
 

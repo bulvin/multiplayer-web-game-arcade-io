@@ -45,7 +45,7 @@ function createTableCell(content) {
 
 function createJoinButton(roomName) {
   const joinButton = document.createElement("button");
-  joinButton.textContent = "Dołącz";
+  joinButton.textContent = "JOIN";
   joinButton.classList.add("join-button");
   joinButton.addEventListener("click", () => {
     joinRoom(roomName);
@@ -79,11 +79,11 @@ elements.createRoomBtn.addEventListener("click", (e) => {
   e.preventDefault();
 
   Swal.fire({
-    title: "Stwórz pokój rozgrywki",
+    title: "Creates a room game",
     html: getFormCreateRoomHTML(),
     showCancelButton: true,
-    confirmButtonText: "Stwórz",
-    cancelButtonText: "Anuluj",
+    confirmButtonText: "Create",
+    cancelButtonText: "Cancel",
   }).then((result) => {
     if (result.isConfirmed) {
       const roomName = document.getElementById("room-name").value;
@@ -96,9 +96,9 @@ elements.createRoomBtn.addEventListener("click", (e) => {
 
 function getFormCreateRoomHTML() {
   return `
-      <input id="room-name" class="swal2-input" placeholder="Nazwa pokoju">
+      <input id="room-name" class="swal2-input" placeholder="Room name">
       <select id="max-players" class="swal2-select">
-        <option value="">Liczba graczy</option>
+        <option value="">Number of players</option>
         ${Array.from({ length: 7 }, (_, i) => `<option value="${i + 2}">${i + 2}</option>`).join('')}
       </select>
     `;
@@ -158,7 +158,7 @@ export function updatePlayersInRoom(data) {
     li.textContent = nickname;
     listTemplate.appendChild(li);
   });
-  roomName.textContent = 'Pokój: ' + data.name;
+  roomName.textContent = 'Room: ' + data.name;
 }
 
 

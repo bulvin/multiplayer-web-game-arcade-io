@@ -6,25 +6,26 @@ export class UserController {
         this.socket = socket;
         this.user = user;
     }
+
     joinRoom(room) {
         this.socket.join(room);
-        this.user.room = room
+        this.user.room = room;
         if (room !== "rooms") {
-            this.socket.emit("message", formatMessage("SERWER", "Witaj graczu!", "info"));
+            this.socket.emit("message", formatMessage("SERVER", "Welcome, player!", "info"));
             this.socket.to(room).emit(
                 "message",
-                formatMessage("SERWER", `${this.user.name} dołączył do gry`, "info")
+                formatMessage("SERVER", `${this.user.name} has joined the game`, "info")
             );
         }
-
     }
 
     leaveCurrRoom() {
         this.socket.leave(this.user.room);
         if (this.user.room !== "rooms") {
-            this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} opuścił grę.`, "info"));
+            this.socket.to(this.user.room).emit("message", formatMessage('SERVER', `Player ${this.user.name} has left the game.`, "info"));
         }
     }
+
     sendMessage(message) {
         if (message.trim() === "" || !message || message.length > 255) return;
 
@@ -33,20 +34,14 @@ export class UserController {
     }
 
     updateGameForm(gameData, room) {
-
         const GameDataFormValidation = isValidToStartGame(gameData, room);
         if (GameDataFormValidation.error) {
             return;
         }
         this.socket.to(this.user.room).emit("updateGameForm", gameData);
-
     }
 
     disconnect() {
-        this.socket.to(this.user.room).emit("message", formatMessage('SERWER', `Gracz ${this.user.name} rozłączył się.`, "info"));
+        this.socket.to(this.user.room).emit("message", formatMessage('SERVER', `Player ${this.user.name} has disconnected.`, "info"));
     }
-
-
-
-
 }
